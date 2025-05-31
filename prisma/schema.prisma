@@ -1,0 +1,249 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model superadmin {
+  id                Int       @id @default(autoincrement())
+  name              String
+  email             String    @unique
+  password          String
+  mobile            String
+  address           String
+  city              String
+  state             String
+  pinCode           String
+  gstNumber         String
+  contactPerson     String
+  contactMobile     String
+  region            String
+  active            Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  status            String
+  passwordUpdatedAt DateTime? @default(now())
+}
+
+model customer {
+  id           Int      @id @default(autoincrement())
+  title        String
+  customerName String
+  mobile       String   @unique
+  address1     String
+  address2     String?
+  address3     String?
+  city         String
+  state        String
+  postCode     String
+  email        String   @unique
+  kyc          String
+  dateOfBirth  DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime
+  userId       String
+  status       String
+}
+
+model dealer {
+  id                      Int       @id @default(autoincrement())
+  salesChannel            String
+  dealerName              String
+  email                   String    @unique
+  password                String
+  dealerLocation          String
+  dealerCode              String
+  vas                     String
+  businessPartnerName     String
+  businessPartnerCategory String
+  lanNumber               String
+  policyBookingDate       DateTime
+  membershipFees          String
+  brokerDetails           String
+  locationCode            String
+  loanApiIntegration      String
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime
+  userId                  String
+  status                  String
+  plan                    String
+  passwordUpdatedAt       DateTime? @default(now())
+  tier                    String?
+}
+
+model dealerpayment {
+  id             Int       @id @default(autoincrement())
+  dealerId       String
+  month          Int
+  year           Int
+  insuranceCount Int
+  discount       Float
+  baseAmount     Float
+  finalAmount    Float
+  paid           Boolean   @default(false)
+  paymentDate    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime
+}
+
+model distributor {
+  id                Int       @id @default(autoincrement())
+  name              String
+  email             String    @unique
+  password          String
+  mobile            String
+  address           String
+  city              String
+  state             String
+  pinCode           String
+  gstNumber         String
+  contactPerson     String
+  contactMobile     String
+  region            String
+  active            Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime
+  userId            String
+  status            String
+  plan              String
+  passwordUpdatedAt DateTime? @default(now())
+}
+
+model insurance {
+  id                      Int      @id @default(autoincrement())
+  mobile                  String
+  kitNumber               String
+  policyType              String
+  policyHolder            String
+  productName             String
+  productId               String
+  tier                    String
+  certificateNo           String
+  policyNumber            String
+  policyStartDate         DateTime
+  expiryDate              DateTime
+  policyStatus            String
+  make                    String
+  modelNo                 String
+  invoiceDate             DateTime
+  invoiceAmount           Float?
+  invoiceNo               String
+  imeiNumber              String
+  salesChannel            String
+  dealerName              String
+  dealerLocation          String
+  dealerCode              String
+  vas                     String
+  businessPartnerName     String
+  businessPartnerCategory String
+  lanNumber               String
+  policyBookingDate       DateTime
+  membershipFees          String
+  brokerDetails           String
+  locationCode            String
+  loanApiIntegration      String
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime
+  userId                  String
+  dueamount               Float?
+  paidstatus              String
+}
+
+model payment {
+  id                Int      @id @default(autoincrement())
+  dealerId          String
+  amount            Float
+  discount          Float
+  baseAmount        Float
+  paymentMode       String   @default(dbgenerated("(RAZORPAY)"))
+  referenceNumber   String?
+  remarks           String?
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  status            String   @default(dbgenerated("(PENDING)"))
+  createdAt         DateTime @default(now())
+}
+
+model plan {
+  id        Int        @id @default(autoincrement())
+  name      String
+  role      plan_role
+  createdAt DateTime   @default(now())
+  updatedAt DateTime
+ tiers     PlanTier[]
+}
+
+model PlanTier {
+  id              Int      @id @default(autoincrement())
+  planId          Int
+  discountPercent Float
+  insuranceCount  Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime
+  plan            plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  @@index([planId])
+}
+
+model policy {
+  id            Int      @id @default(autoincrement())
+  category      String
+  invoiceAmount Int
+  ew1Year       Int?
+  ew2Year       Int?
+  ew3Year       Int?
+  adld          Int?
+  combo1Year    Int?
+  slabMin       Int
+  slabMax       Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+  userId        String
+}
+
+model policypricing {
+  id         Int      @id @default(autoincrement())
+  category   String
+  minAmount  Int
+  maxAmount  Int
+  ew1Year    Int?
+  ew2Year    Int?
+  ew3Year    Int?
+  adld       Int?
+  combo1Year Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+}
+
+model user {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  mobile    String
+  role      user_role
+  createdAt DateTime  @default(now())
+  updatedAt DateTime
+  status    String
+  roleid    String
+}
+
+enum plan_role {
+  DEALER
+  DISTRIBUTOR
+  NBFC
+  BANK
+  SUPERADMIN
+  CUSTOMER
+}
+
+enum user_role {
+  DEALER
+  DISTRIBUTOR
+  NBFC
+  BANK
+  SUPERADMIN
+  CUSTOMER
+}
