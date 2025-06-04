@@ -10,11 +10,11 @@ export async function POST(req: NextRequest) {
 
   //let data = { email };
   if (user.role === "DEALER") {
-    await prisma.dealer.update({ where: { id: user.id }, data: { dealerName: name, email } });
+    await prisma.dealer.update({ where: { id: parseInt(user.id,10) }, data: { dealerName: name, email } });
   } else if (user.role === "DISTRIBUTOR") {
-    await prisma.distributor.update({ where: { id: user.id }, data: { name, email } });
+    await prisma.distributor.update({ where: { id: parseInt(user.id,10) }, data: { name, email } });
   } else if (user.role === "SUPERADMIN") {
-    await prisma.superadmin.update({ where: { id: user.id }, data: { name, email } });
+    await prisma.superadmin.update({ where: { id: parseInt(user.id,10) }, data: { name, email } });
   }
 
   return NextResponse.json({ success: true });

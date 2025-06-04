@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { redirect } from "next/navigation";
 
 interface JwtPayload {
-  id: string;
+  id: number;
   role: "DEALER" | "DISTRIBUTOR" | "SUPERADMIN";
   email:string;
 }
@@ -35,7 +35,7 @@ export default async function InvoicePage({ params }: Props) {
 
   // 2. Fetch payment + dealer info
   const payment = await prisma.payment.findUnique({
-    where: { id: params.id }
+    where: { id: parseInt(params.id,10) }
   });
 
   if (!payment) return <div className="p-8">Invoice not found</div>;

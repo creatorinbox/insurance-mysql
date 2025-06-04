@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     const payment = await prisma.payment.create({
       data: {
-        dealerId:user.id,
+        dealerId:parseInt(user.id,10),
         amount: parseFloat(amount),
         baseAmount: parseFloat(base),
         discount: 0,

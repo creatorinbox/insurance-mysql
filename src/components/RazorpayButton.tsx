@@ -159,7 +159,7 @@ type Props = {
   amount: number;
   discount: number;
   base: number;
-  dealerId: string;
+  dealerId: number;
   onClose: () => void;  // add this line
 };
 interface RazorpayPaymentResponse {

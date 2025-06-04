@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PayNowPopup from "@/components/PayNowPopup";
 interface DistributorPayment {
-  id: string;
+  id: number;
   dealerName: string;
   salesAmount: number;
   dueAmount: number;
@@ -23,7 +23,7 @@ export default function DistributorPaymentsPage() {
       .then((res) => setDealers(res));
   }, []);
 
-  const handleAction = async (id: string, action: "block" | "terminate"| "active") => {
+  const handleAction = async (id: number, action: "block" | "terminate"| "active") => {
     const confirmMsg = `Are you sure you want to ${action} this dealer?`;
     if (!window.confirm(confirmMsg)) return;
 
@@ -43,7 +43,7 @@ export default function DistributorPaymentsPage() {
       alert(`Failed to ${action} dealer.`);
     }
   };
-const handleMarkPaid = async (dealerId: string) => {
+const handleMarkPaid = async (dealerId: number) => {
   const confirm = window.confirm("Are you sure you want to mark all dues as paid?");
   if (!confirm) return;
 

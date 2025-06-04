@@ -11,7 +11,7 @@ export async function GET(_: NextRequest, { params }: Params) {
 
     const insurances = await prisma.insurance.findMany({
       where: {
-        userId: dealerId, // Note: dealerName stores dealer ID
+        userId: parseInt(dealerId,10), // Note: dealerName stores dealer ID
       },
       select: {
         id: true,

@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   switch (payload.role) {
     case "DEALER":
       await prisma.dealer.update({
-        where: { id: payload.id },
+        where: { id: parseInt(payload.id,10) },
         data: {
           password: hashedPassword,
           passwordUpdatedAt: new Date(),
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       break;
     case "DISTRIBUTOR":
       await prisma.distributor.update({
-        where: { id: payload.id },
+        where: { id: parseInt(payload.id,10) },
         data: {
           password: hashedPassword,
           passwordUpdatedAt: new Date(),
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       break;
     case "SUPERADMIN":
       await prisma.superadmin.update({
-        where: { id: payload.id },
+        where: { id: parseInt(payload.id,10) },
         data: {
           password: hashedPassword,
           passwordUpdatedAt: new Date(),

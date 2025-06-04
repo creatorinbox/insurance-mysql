@@ -49,6 +49,7 @@ export async function POST(req: Request) {
       ew3Year: row.EW3Year ? Number(row.EW3Year) : undefined,
       adld: row.ADLD ? Number(row.ADLD) : undefined,
       combo1Year: row.Combo1Year ? Number(row.Combo1Year) : undefined,
+      updatedAt:new Date(),
     }));
 //runbuild
     // const records = (rows as any[]).map((row) => ({

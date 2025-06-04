@@ -29,6 +29,7 @@
     "flatpickr": "^4.6.13",
     "formidable": "^3.5.4",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^3.0.1",
     "mongodb": "^6.15.0",
     "next": "15.1.3",
     "razorpay": "^2.9.6",

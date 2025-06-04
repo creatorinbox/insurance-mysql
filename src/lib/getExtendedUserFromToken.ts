@@ -15,17 +15,17 @@ export async function getExtendedUserFromToken(): Promise<{
 
   if (user.role === "DEALER") {
     result = await prisma.dealer.findUnique({
-      where: { id: user.id },
+      where: { id: parseInt(user.id,10) },
       select: { passwordUpdatedAt: true },
     });
   } else if (user.role === "DISTRIBUTOR") {
     result = await prisma.distributor.findUnique({
-      where: { id: user.id },
+      where: { id: parseInt(user.id,10) },
       select: { passwordUpdatedAt: true },
     });
   } else if (user.role === "SUPERADMIN") {
     result = await prisma.superadmin.findUnique({
-      where: { id: user.id },
+      where: { id: parseInt(user.id,10) },
       select: { passwordUpdatedAt: true },
     });
   }

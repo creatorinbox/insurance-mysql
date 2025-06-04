@@ -8,7 +8,7 @@ interface Props {
   baseAmount: number;
   discount: number;
   payableAmount: number;
-  dealerId:string;
+  dealerId:number;
 }
 
 export default function PayNowPopup({ baseAmount, discount, payableAmount,dealerId }: Props) {

@@ -11,6 +11,7 @@ async function main() {
       ew1Year: 1200,
       ew2Year: 2100,
       ew3Year: 3000,
+      updatedAt:new Date(),
     },
   });
 

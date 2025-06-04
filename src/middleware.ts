@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
   console.log("✅ Middleware executing for", pathname);
 
   // Skip auth checks for public routes
-  const publicPaths = ['/login',  '/api', '/_next', '/favicon.ico'];
+  const publicPaths = ['/login',  '/mobile-login', '/_next', '/favicon.ico'];
   const isPublic = publicPaths.some((path) => pathname.startsWith(path));
 
   if (isPublic) {

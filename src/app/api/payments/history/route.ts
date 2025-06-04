@@ -11,7 +11,7 @@ export async function GET() {
     }
 
     const history = await prisma.payment.findMany({
-      where: { dealerId: user.id },
+      where: { dealerId: parseInt(user.id,10) },
       orderBy: { createdAt: "desc" },
     });
 

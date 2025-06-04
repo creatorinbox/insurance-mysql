@@ -1,4 +1,4 @@
-import { PrismaClient, Role } from "@prisma/client";
+import { PrismaClient, plan_role } from "@prisma/client";
 //import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -13,9 +13,10 @@ export async function POST(req: Request) {
       email: body.email,
       password: body.password,
       mobile: body.mobile,
-      role: body.role as Role,
+      role: body.role as plan_role,
       roleid:body.referenceId,
       status:  "ACTIVE", // or hardcode "ACTIVE" if you want
+      updatedAt:new Date(),
     },
   });
 

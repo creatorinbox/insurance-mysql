@@ -69,9 +69,13 @@ export default function CreateDistributorPage() {
       return;
     }
 
+  const payload = {
+    ...formData,
+    planId: parseInt(formData.planId, 10), // ✅ force planId to integer
+  };
     const res = await fetch("/api/distributor", {
       method: "POST",
-      body: JSON.stringify(formData),
+      body: JSON.stringify(payload),
       headers: {
         "Content-Type": "application/json",
       },

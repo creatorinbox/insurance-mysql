@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const user = await getExtendedUserFromToken();
-  if (!user) return <div className="p-8 text-red-600">Unauthorized</div>;
+  if (!user) redirect("/login");
   if (user.expired) redirect("/reset-password");
 
   const { id: userId, role } = user;
@@ -23,7 +23,7 @@ export default async function DashboardPage() {
   let eligibleForPayment = false;
 
   if (role === "DEALER") {
-    const dealer = await prisma.dealer.findUnique({ where: { id: userId } });
+    const dealer = await prisma.dealer.findUnique({ where: { id: parseInt(userId,10) } });
 
     if (dealer) {
       const insurances = await prisma.insurance.findMany({
@@ -54,7 +54,7 @@ export default async function DashboardPage() {
   }
 
   if (role === "DISTRIBUTOR") {
-    const dealers = await prisma.dealer.findMany({ where: { userId } });
+    const dealers = await prisma.dealer.findMany({ where: { userId:parseInt(userId,10) } });
     const dealerIds = dealers.map((d) => d.id);
 
     const insurances = await prisma.insurance.findMany({
@@ -87,7 +87,7 @@ export default async function DashboardPage() {
       eligibleForPayment = true;
 
       const distributor = await prisma.distributor.findUnique({
-        where: { id: userId },
+        where: { id: parseInt(userId,10) },
       });
 
       if (distributor?.plan) {
@@ -128,7 +128,7 @@ export default async function DashboardPage() {
 if (role === "SUPERADMIN") {
   const distributors = await prisma.distributor.findMany();
   for (const dist of distributors) {
-    const dealers = await prisma.dealer.findMany({ where: { userId: String(dist.id) } });
+    const dealers = await prisma.dealer.findMany({ where: { userId: dist.id } });
     const dealerIds = dealers.map(d => d.id);
 
     const payments = await prisma.payment.findMany({

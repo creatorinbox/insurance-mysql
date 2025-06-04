@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   try {
     await prisma.dealer.update({
-      where: { id: params.id },
+      where: { id: parseInt(params.id,10) },
       data: { status: "ACTIVE" },
     });
 

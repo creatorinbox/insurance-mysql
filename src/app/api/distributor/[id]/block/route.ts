@@ -8,7 +8,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   try {
     const updatedDealer = await prisma.distributor.update({
-      where: { id: dealerId },
+      where: { id: parseInt(dealerId,10) },
       data: { status: "BLOCKED" },
     });
 

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import {  NextResponse } from "next/server";
 //import { ObjectId } from "mongodb";
 //import jwt from "jsonwebtoken";
-import { getUserFromToken } from "@/lib/getUserFromToken";
+//import { getUserFromToken } from "@/lib/getUserFromToken";
 
 // export async function POST(req: NextRequest) {
 //   try {
@@ -78,49 +78,49 @@ import { getUserFromToken } from "@/lib/getUserFromToken";
 //     );
 //   }
 // }
-export async function POST(req: Request) {
-  try {
-     const user = await getUserFromToken();
+// export async function POST(req: Request) {
+//   try {
+//      const user = await getUserFromToken();
     
-        if (!user) {
-          return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-        }
-    const body = await req.json();
-    const { category, invoiceAmount } = body;
+//         if (!user) {
+//           return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+//         }
+//     const body = await req.json();
+//     const { category, invoiceAmount } = body;
 
-    const pricing = await prisma.policyPricing.findFirst({
-      where: {
-        category,
-        minAmount: { lte: invoiceAmount },
-        maxAmount: { gte: invoiceAmount },
-      },
-    });
+//     const pricing = await prisma.policypricing.findFirst({
+//       where: {
+//         category,
+//         minAmount: { lte: invoiceAmount },
+//         maxAmount: { gte: invoiceAmount },
+//       },
+//     });
 
-    if (!pricing) {
-      return NextResponse.json({ error: "No pricing found" }, { status: 404 });
-    }
+//     if (!pricing) {
+//       return NextResponse.json({ error: "No pricing found" }, { status: 404 });
+//     }
 
-    const newPolicy = await prisma.policy.create({
-      data: {
-        category,
-        invoiceAmount,
-        ew1Year: pricing.ew1Year,
-        ew2Year: pricing.ew2Year,
-        ew3Year: pricing.ew3Year,
-        adld: pricing.adld,
-        combo1Year: pricing.combo1Year,
-        slabMin: pricing.minAmount,
-        slabMax: pricing.maxAmount,
-        userId:user.id,
-      },
-    });
+//     const newPolicy = await prisma.policy.create({
+//       data: {
+//         category,
+//         invoiceAmount,
+//         ew1Year: pricing.ew1Year,
+//         ew2Year: pricing.ew2Year,
+//         ew3Year: pricing.ew3Year,
+//         adld: pricing.adld,
+//         combo1Year: pricing.combo1Year,
+//         slabMin: pricing.minAmount,
+//         slabMax: pricing.maxAmount,
+//         userId:user.id,
+//       },
+//     });
 
-    return NextResponse.json(newPolicy, { status: 201 });
-  } catch (err) {
-    console.error("[POLICY_CREATE_ERROR]", err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
-}
+//     return NextResponse.json(newPolicy, { status: 201 });
+//   } catch (err) {
+//     console.error("[POLICY_CREATE_ERROR]", err);
+//     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+//   }
+// }
 export async function GET() {
   try {
     const policies = await prisma.policyPricing.findMany({

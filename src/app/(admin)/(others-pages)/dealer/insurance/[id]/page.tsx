@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 interface Insurance {
-  id: string;
+  id: number;
   invoiceAmount: string;  // as stored in your DB
   dueamount?: string;
 }
@@ -23,12 +23,14 @@ export default function DealerInsurancePage() {
         const res = await fetch(`/api/dealer/${id}/insurances`, {
           credentials: "include",
         });
+                console.log('result',res);
+
         if (!res.ok) throw new Error("Not found");
         const data: Insurance[] = await res.json();
         setInsurances(data);
       } catch (err) {
         console.error("Error fetching dealer insurances", err);
-        router.replace("/404");
+        //router.replace("/404");
       } finally {
         setLoading(false);
       }

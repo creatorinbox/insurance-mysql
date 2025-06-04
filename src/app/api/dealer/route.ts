@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 // Replace this with your real JWT secret
 //const JWT_SECRET = process.env.JWT_SECRET!;
 interface JwtPayload {
-  id: string;
+  id: number;
   role: string;
   // any other fields you embed in the token
 }
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
      }
    
-     let user: { id: string; role: string };
+     let user: { id: number; role: string };
      try {
        user = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
      } catch {
@@ -45,12 +45,13 @@ export async function POST(req: NextRequest) {
         brokerDetails: form.get("brokerDetails")?.toString() || "",
         locationCode: form.get("locationCode")?.toString() || "",
         loanApiIntegration: form.get("loanApiIntegration")?.toString() || "",
-       plan: form.get("planId")?.toString() || "",
+       plan: parseInt(form.get("planId")?.toString() || "0", 10),
          email: form.get("email")?.toString() || "",
         password: form.get("password")?.toString() || "",
        status:"ACTIVE",
        tier:form.get("tier")?.toString() || "",
-        userId:user.id
+        userId:user.id,
+        updatedAt:new Date(),
       },
     });
 
@@ -74,7 +75,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ message: "Unauthorized - Token missing" }, { status: 401 });
   }
 
-  let user: { id: string; role: string };
+  let user: { id: number; role: string };
   try {
     user = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
     if (!user) {

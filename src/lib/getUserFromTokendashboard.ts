@@ -25,7 +25,7 @@ export async function getUserFromToken(): Promise<{
 
     if (payload.role === "DEALER") {
       user = await prisma.dealer.findUnique({
-        where: { id: payload.id },
+        where: { id: parseInt(payload.id,10) },
         select: { dealerName: true, email: true, passwordUpdatedAt: true },
       });
       if (!user) return null;
@@ -43,7 +43,7 @@ export async function getUserFromToken(): Promise<{
 
     if (payload.role === "DISTRIBUTOR") {
       user = await prisma.distributor.findUnique({
-        where: { id: payload.id },
+        where: { id: parseInt(payload.id,10) },
         select: { name: true, email: true, passwordUpdatedAt: true },
       });
       if (!user) return null;
@@ -61,7 +61,7 @@ export async function getUserFromToken(): Promise<{
 
     if (payload.role === "SUPERADMIN") {
       user = await prisma.superadmin.findUnique({
-        where: { id: payload.id },
+        where: { id: parseInt(payload.id,10) },
         select: { name: true, email: true, passwordUpdatedAt: true },
       });
       if (!user) return null;

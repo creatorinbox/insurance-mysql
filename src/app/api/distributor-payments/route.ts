@@ -279,7 +279,7 @@ export async function GET(req: Request) {
     }
 
     const distributor = await prisma.distributor.findUnique({
-      where: { id: user.id },
+      where: { id: parseInt(user.id) },
     });
 
     if (!distributor) {
@@ -287,7 +287,7 @@ export async function GET(req: Request) {
     }
 
     const dealers = await prisma.dealer.findMany({
-      where: { userId: user.id },
+      where: { userId: parseInt(user.id,10) },
       select: { id: true, dealerName: true, status: true,plan: true},
     });
 

@@ -12,9 +12,13 @@ export interface PolicyPricingInput {
   ew3Year?: number;
   adld?: number;
   combo1Year?: number;
+ 
 }
 export async function createPolicyPricing(data:PolicyPricingInput) {
-  await prisma.policyPricing.create({ data });
+  await prisma.policyPricing.create({ data: {
+      ...data, // Spread existing data
+      updatedAt: new Date(), // Add updatedAt timestamp
+    }  });
   revalidatePath("/policy-pricing");
 }
 
@@ -33,7 +37,7 @@ export async function updatePolicyPricing(id: string, data: PolicyPricingInput) 
   } = data;
 
   return await prisma.policyPricing.update({
-    where: { id },
+    where: { id:parseInt(id,10) },
     data: {
       category,
       minAmount,
@@ -49,7 +53,7 @@ export async function updatePolicyPricing(id: string, data: PolicyPricingInput) 
 export async function deletePolicyPricing(id: string) {
   try {
     await prisma.policyPricing.delete({
-      where: { id },
+      where: { id:parseInt(id,10) },
     });
   } catch (error) {
     console.error("Failed to delete policy pricing:", error);

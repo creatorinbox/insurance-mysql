@@ -157,7 +157,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
     // Step 1: Get all dealers under the distributor
     const dealers = await prisma.dealer.findMany({
-      where: { userId: distributorId },
+      where: { userId: parseInt(distributorId) },
       select: { id: true, dealerName: true },
     });
 

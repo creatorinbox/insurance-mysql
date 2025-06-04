@@ -127,7 +127,7 @@ export async function importInsuranceExcel(formData: FormData) {
     if (!item.id) continue;
 
     await prisma.insurance.upsert({
-      where: { id: item.id },
+      where: { id: parseInt(item.id,10) },
       update: {
         mobile: item.mobile,
         kitNumber: item.kitNumber,
@@ -160,14 +160,14 @@ export async function importInsuranceExcel(formData: FormData) {
         brokerDetails: item.brokerDetails,
         locationCode: item.locationCode,
         loanApiIntegration: item.loanApiIntegration,
-        userId: item.userId,
+        userId: parseInt(item.userId,10),
         dueamount: parseFloat(item.dueamount),
         paidstatus: item.paidstatus,
         createdAt: new Date(item.createdAt),
         updatedAt: new Date(item.updatedAt),
       },
       create: {
-        id: item.id,
+        id: parseInt(item.id,10),
         mobile: item.mobile,
         kitNumber: item.kitNumber,
         policyType: item.policyType,
@@ -199,7 +199,7 @@ export async function importInsuranceExcel(formData: FormData) {
         brokerDetails: item.brokerDetails,
         locationCode: item.locationCode,
         loanApiIntegration: item.loanApiIntegration,
-        userId: item.userId,
+        userId: parseInt(item.userId,10),
         dueamount:  parseFloat(item.dueamount),
         paidstatus: item.paidstatus,
         createdAt: new Date(item.createdAt),

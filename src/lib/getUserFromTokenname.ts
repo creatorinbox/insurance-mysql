@@ -9,7 +9,7 @@ interface JwtPayload {
 }
 
 export async function getUserFromTokenname(): Promise<{
-  id: string;
+  id: number;
   role: string;
   name: string;
   email: string;
@@ -25,7 +25,7 @@ export async function getUserFromTokenname(): Promise<{
 
     if (payload.role === "DEALER") {
       user = await prisma.dealer.findUnique({
-        where: { id: payload.id },
+        where: { id: parseInt(payload.id,10) },
         select: { id: true, dealerName: true, email: true },
       });
       return user ? { id: user.id, role: "DEALER", name: user.dealerName, email: user.email } : null;
@@ -33,7 +33,7 @@ export async function getUserFromTokenname(): Promise<{
 
     if (payload.role === "DISTRIBUTOR") {
       user = await prisma.distributor.findUnique({
-        where: { id: payload.id },
+        where: { id: parseInt(payload.id,10) },
         select: { id: true, name: true, email: true },
       });
       return user ? { id: user.id, role: "DISTRIBUTOR", name: user.name, email: user.email } : null;
@@ -41,7 +41,7 @@ export async function getUserFromTokenname(): Promise<{
 
     if (payload.role === "SUPERADMIN") {
       user = await prisma.superadmin.findUnique({
-        where: { id: payload.id },
+        where: { id: parseInt(payload.id,10) },
         select: { id: true, name: true, email: true },
       });
       return user ? { id: user.id, role: "SUPERADMIN", name: user.name, email: user.email } : null;

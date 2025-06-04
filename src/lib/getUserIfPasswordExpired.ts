@@ -15,11 +15,11 @@ export async function getUserIfPasswordExpired(token: string): Promise<{ expired
     let user: { passwordUpdatedAt?: Date | null } | null = null;
 
     if (role === "DEALER") {
-      user = await prisma.dealer.findUnique({ where: { id }, select: { passwordUpdatedAt: true } });
+      user = await prisma.dealer.findUnique({ where: { id:parseInt(id,10) }, select: { passwordUpdatedAt: true } });
     } else if (role === "DISTRIBUTOR") {
-      user = await prisma.distributor.findUnique({ where: { id }, select: { passwordUpdatedAt: true } });
+      user = await prisma.distributor.findUnique({ where: { id:parseInt(id,10) }, select: { passwordUpdatedAt: true } });
     } else if (role === "SUPERADMIN") {
-      user = await prisma.superadmin.findUnique({ where: { id }, select: { passwordUpdatedAt: true } });
+      user = await prisma.superadmin.findUnique({ where: { id:parseInt(id,10) }, select: { passwordUpdatedAt: true } });
     }
 
     if (!user) return { expired: false };

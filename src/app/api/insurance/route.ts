@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
               return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
             }
         
-            const user = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+            const user = jwt.verify(token, process.env.JWT_SECRET!) as { id: number };
 
             const dealer = await prisma.dealer.findUnique({
       where: { id: user.id },
@@ -160,7 +160,8 @@ const kitNumber = `${prefix}${stateCode}${currentMonth}${yearCode}${generateSeri
         loanApiIntegration: form.get("loanApiIntegration")?.toString() || "",
         userId: user.id,
         dueamount:parseFloat(form.get("invoiceAmount")?.toString() || "0"),
-        paidstatus:"pending"
+        paidstatus:"pending",
+        updatedAt:new Date(),
       },
     });
 
@@ -241,7 +242,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const user = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+    const user = jwt.verify(token, process.env.JWT_SECRET!) as { id: number };
 
     const insurances = await prisma.insurance.findMany({
       where: { userId: user.id },

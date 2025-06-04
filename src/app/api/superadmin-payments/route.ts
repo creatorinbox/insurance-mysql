@@ -98,7 +98,7 @@ export async function GET(req: Request) {
 
     // 1. Find all distributors under superadmin
     const distributors = await prisma.distributor.findMany({
-      where: { userId: user.id },
+      where: { userId: parseInt(user.id,10) },
       select: { id: true, name: true, status: true },
     });
 
@@ -148,7 +148,7 @@ export async function GET(req: Request) {
     // 5. Group by distributor
     const distributorSummary: Record<
       string,
-      { distributorId: string; distributorName: string; salesAmount: number; dueAmount: number; status: string }
+      { distributorId: number; distributorName: string; salesAmount: number; dueAmount: number; status: string }
     > = {};
 
     for (const dealer of dealers) {

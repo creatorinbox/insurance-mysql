@@ -29,6 +29,7 @@ interface Customer {
   dateOfBirth: string;
 }
 export default function FormElements() {
+    const [showThankYouModal, setShowThankYouModal] = useState(false);
   //const { userId } = useParams<{ userId: string }>();
   const [showModal, setShowModal] = useState(false);
   const [policies, setPolicies] = useState<{ id: string; category: string }[]>([]);
@@ -180,9 +181,10 @@ const handleFinalSubmit = async () => {
 
   if (!res.ok) {
     alert("Failed to create insurance");
-    router.push("/insurance-tables");
+  //  router.push("/insurance-tables");
   } else {
     alert("Insurance created successfully");
+          setShowThankYouModal(true); // Show the "Thank You" popup
     router.push("/insurance-tables");
   }
 };
@@ -433,6 +435,24 @@ console.log('catval',policies);
     </div>
   </div>
 )}
+{/* Thank You Modal */}
+      {showThankYouModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <h2 className="text-xl font-bold">🎉 Thank You!</h2>
+            <p className="text-gray-600">Your insurance has been created successfully.</p>
+            <button
+              onClick={() => {
+                setShowThankYouModal(false);
+                router.push("/insurance-tables"); // Redirect after closing
+              }}
+              className="mt-4 px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
+            >
+              Close & View Insurance
+            </button>
+          </div>
+        </div>
+      )}
     </div>
    
 

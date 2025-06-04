@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 const prisma = new PrismaClient();
 interface JwtPayload {
-  id: string;
+  id: number;
   role: string;
   // any other fields you embed in the token
 }
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify JWT
-    let user: { id: string; role: string };
+    let user: { id: number; role: string };
     try {
       user = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
     } catch {
@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
         dateOfBirth: new Date(dateOfBirth),
         userId: user.id,
         status: "ACTIVE",
+        updatedAt:new Date(),
       },
     });
 

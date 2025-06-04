@@ -29,7 +29,7 @@
 // app/profile/page.tsx
 import { getUserFromToken } from "@/lib/getUserFromToken";
 import { prisma } from "@/lib/prisma";
-import type { Dealer, Distributor, superadmin } from "@prisma/client";
+import type { dealer, distributor, superadmin } from "@prisma/client";
 
 export default async function ProfilePage() {
   const user = await getUserFromToken();
@@ -37,12 +37,12 @@ export default async function ProfilePage() {
     return <div className="p-6 text-red-600">Unauthorized</div>;
   }
 
-let userData: Dealer | Distributor | superadmin | null = null;  if (user.role === "DEALER") {
-    userData = await prisma.dealer.findUnique({ where: { id: user.id } });
+let userData: dealer | distributor | superadmin | null = null;  if (user.role === "DEALER") {
+    userData = await prisma.dealer.findUnique({ where: { id: parseInt(user.id,10) } });
   } else if (user.role === "DISTRIBUTOR") {
-    userData = await prisma.distributor.findUnique({ where: { id: user.id } });
+    userData = await prisma.distributor.findUnique({ where: { id: parseInt(user.id,10)} });
   } else if (user.role === "SUPERADMIN") {
-    userData = await prisma.superadmin.findUnique({ where: { id: user.id } });
+    userData = await prisma.superadmin.findUnique({ where: { id: parseInt(user.id,10) } });
   }
 
   return (

@@ -7,7 +7,7 @@ interface InsuranceDetailPageProps {
 
 export default async function InsuranceDetailPage({ params }: InsuranceDetailPageProps) {
   const insurance = await prisma.insurance.findUnique({
-    where: { id: params.id },
+    where: { id: parseInt(params.id,10) },
   });
 
   if (!insurance) return notFound();
@@ -28,7 +28,7 @@ const price = policy?.[yearKey] ?? "N/A";
 
 
   const dealer = await prisma.dealer.findUnique({
-    where: { id: insurance.dealerName },
+    where: { id: parseInt(insurance.dealerName,10) },
   });
 
   return (
@@ -51,7 +51,7 @@ const price = policy?.[yearKey] ?? "N/A";
         <h2 className="text-xl font-semibold mb-2">Policy</h2>
         {policy ? (
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Policy Number" value={policy.id} />
+            <Field label="Policy Number" value={String(policy.id)} />
             <Field label="Type" value={String(price)} />
             <Field label="Category" value={policy.category} />
             {/* <Field label="Tier" value={policy.tier} />

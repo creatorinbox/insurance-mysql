@@ -11,6 +11,10 @@ interface Insurance {
   membershipFees: string;
   policyStartDate: string;
   expiryDate: string;
+    policyPrice?: {
+    ewYear: string;
+    price: number;
+  };
 }
 
 export default function CustomerClient() {
@@ -30,24 +34,43 @@ export default function CustomerClient() {
     fetchInsurance();
   }, [mobile]);
 
-  const handleDownload = () => {
-    const content = insurances
-      .map(
-        (i) =>
-          `Policy: ${i.policyNumber}\nProduct: ${i.productName}\nPremium: ₹${i.membershipFees}\nValidity: ${i.policyStartDate} to ${i.expiryDate}`
-      )
-      .join("\n\n");
+  // const handleDownload = () => {
+  //   const content = insurances
+  //     .map(
+  //       (i) =>
+  //         `Policy: ${i.policyNumber}\nProduct: ${i.productName}\nPremium: ₹${i.membershipFees}\nValidity: ${i.policyStartDate} to ${i.expiryDate}`
+  //     )
+  //     .join("\n\n");
 
-    const blob = new Blob([content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "policy-details.txt";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  //   const blob = new Blob([content], { type: "text/plain" });
+  //   const url = URL.createObjectURL(blob);
+  //   const link = document.createElement("a");
+  //   link.href = url;
+  //   link.download = "policy-details.txt";
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
+const handleDownload = () => {
+  const content = insurances
+    .map(
+      (i) =>
+        `Policy: ${i.policyNumber}
+Product: ${i.productName}
+Policy Price: ${i.policyPrice ? `₹${i.policyPrice.price} (${i.policyPrice.ewYear})` : "Not Available"}
+Validity: ${i.policyStartDate} to ${i.expiryDate}`
+    )
+    .join("\n\n");
 
+  const blob = new Blob([content], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "policy-details.txt";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
   return (
     <div className="p-10 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold mb-5">
@@ -73,7 +96,11 @@ export default function CustomerClient() {
                 <tr key={policy.id} className="border-t">
                   <td className="p-2 border">{policy.policyNumber}</td>
                   <td className="p-2 border">{policy.productName}</td>
-                  <td className="p-2 border">₹{policy.membershipFees}</td>
+                   <td className="p-2 border">
+        {policy.policyPrice
+          ? `₹${policy.policyPrice.price} (${policy.policyPrice.ewYear})`
+          : "Not Available"}
+      </td>
                   <td className="p-2 border">
                     {new Date(policy.policyStartDate).toLocaleDateString()}
                   </td>

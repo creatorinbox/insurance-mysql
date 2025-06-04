@@ -15,7 +15,7 @@ export async function POST(
   try {
     const updated = await prisma.insurance.updateMany({
       where: {
-        userId: dealerId,
+        userId: parseInt(dealerId,10),
         policyBookingDate: {
           gte: startOfMonth,
           lte: endOfMonth,

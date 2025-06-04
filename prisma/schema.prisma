@@ -44,7 +44,7 @@ model customer {
   dateOfBirth  DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime
-  userId       String
+  userId       Int
   status       String
 }
 
@@ -67,16 +67,16 @@ model dealer {
   loanApiIntegration      String
   createdAt               DateTime  @default(now())
   updatedAt               DateTime
-  userId                  String
+  userId                  Int
   status                  String
-  plan                    String
+  plan                    Int
   passwordUpdatedAt       DateTime? @default(now())
   tier                    String?
 }
 
 model dealerpayment {
   id             Int       @id @default(autoincrement())
-  dealerId       String
+  dealerId       Int
   month          Int
   year           Int
   insuranceCount Int
@@ -106,9 +106,9 @@ model distributor {
   active            Boolean   @default(true)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime
-  userId            String
+  userId            Int
   status            String
-  plan              String
+  plan              Int
   passwordUpdatedAt DateTime? @default(now())
 }
 
@@ -147,23 +147,23 @@ model insurance {
   loanApiIntegration      String
   createdAt               DateTime @default(now())
   updatedAt               DateTime
-  userId                  String
+  userId                  Int
   dueamount               Float?
   paidstatus              String
 }
 
 model payment {
   id                Int      @id @default(autoincrement())
-  dealerId          String
+  dealerId          Int
   amount            Float
   discount          Float
   baseAmount        Float
-  paymentMode       String   @default(dbgenerated("(RAZORPAY)"))
+  paymentMode       String   @default("RAZORPAY")  
   referenceNumber   String?
   remarks           String?
   razorpayOrderId   String?
   razorpayPaymentId String?
-  status            String   @default(dbgenerated("(PENDING)"))
+  status            String   @default("PENDING")   
   createdAt         DateTime @default(now())
 }
 
@@ -184,7 +184,6 @@ model PlanTier {
   createdAt       DateTime @default(now())
   updatedAt       DateTime
   plan            plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
-  @@index([planId])
 }
 
 model policy {
@@ -200,10 +199,10 @@ model policy {
   slabMax       Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime
-  userId        String
+  userId        Int
 }
 
-model policypricing {
+model PolicyPricing {
   id         Int      @id @default(autoincrement())
   category   String
   minAmount  Int
