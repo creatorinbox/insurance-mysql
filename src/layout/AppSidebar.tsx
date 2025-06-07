@@ -9,12 +9,22 @@ import { useAuth } from "@/hooks/useAuth";
 import {
   BoxCubeIcon,
   ChevronDownIcon,
+  CopyIcon,
+  DollarLineIcon,
   GridIcon,
+ 
   HorizontaLDots,
+ 
+  ListIcon,
   PieChartIcon,
   PlugInIcon,
+  ShootingStarIcon,
   TableIcon,
+  TimeIcon,
+ 
+  UserIcon,
 } from "../icons/index";
+//import { CurrencyRupeeIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 //import SidebarWidget from "./SidebarWidget";
 
 
@@ -37,7 +47,8 @@ console.log('data',user)
     {
       icon: <GridIcon />,
       name: "Dashboard",
-      subItems: [{ name: "Ecommerce", path: "/dashboard", pro: false }],
+      path: "/dashboard",
+      //subItems: [{ name: "Ecommerce", path: "/dashboard", pro: false }],
     },
     // {
     //   icon: <CalenderIcon />,
@@ -66,77 +77,100 @@ console.log('data',user)
     //   subItems: [{ name: "Agent List", path: "/agent-tables", pro: false }],
     // }, 
     {
-      name: "Policy",
-      icon: <TableIcon />,
-      subItems: [{ name: "Policy Plan Listing", path: "/policy-tables", pro: false },
+      name: "Products",
+      icon: <ListIcon />,
+      subItems: [{ name: "Products Listing", path: "/policy-tables", pro: false },
        // { name: "policy Category", path: "/policy-pricing", pro: false },
       ],
     }, {
       name: "Insurance",
-      icon: <TableIcon />,
+      icon: <ShootingStarIcon />,
       subItems: [{ name: "Insurance List", path: "/insurance-tables", pro: false }],
     },
-    {
-      name: "Dealer",
-      icon: <TableIcon />,
-      subItems: [{ name: " Dealer creation", path: "/create-dealer", pro: false },
-        { name: " Dealer Listing", path: "/dealer-tables", pro: false }
-      ],
+    // {
+    //   name: "Dealer",
+    //   icon: <GroupIcon/>,
+    //   subItems: [{ name: " Dealer creation", path: "/create-dealer", pro: false },
+    //     { name: " Dealer Listing", path: "/dealer-tables", pro: false }
+    //   ],
      
   
-    },  {
+    // },  
+    {
       name: "Customer",
-      icon: <TableIcon />,
+      icon: <UserIcon />,
       subItems: [{ name: " customer creation", path: "/create-customer", pro: false },
         { name: " customer Listing", path: "/customer-tables", pro: false }
       ],
      
   
     },
-    {
-      name: "Distributor",
-      icon: <TableIcon />,
-      subItems: [{ name: " Distributor creation", path: "/create-distributor", pro: false },
-        { name: " Distributor Listing", path: "/distributor-tables", pro: false }
-      ],
-    },
-    {
-      name: "Payments",
-      icon: <TableIcon />,
+    // {
+    //   name: "Distributor",
+    //   icon: <UserCircleIcon />,
+    //   subItems: [{ name: " Distributor creation", path: "/create-distributor", pro: false },
+    //     { name: " Distributor Listing", path: "/distributor-tables", pro: false }
+    //   ],
+    // },
+    // {
+    //   name: "Payments",
+    //   icon: <DollarLineIcon/>,
+    //   // subItems: [{ name: "Dealer List", path: "/payment/dealer-payments", pro: false },
+    //   //   { name: "Distributor List", path: "/payment/distributor-payments", pro: false },
+    //   //   { name: "SuperAdmin List", path: "/payment/superadmin", pro: false }
+    //   // ],
+    //   subItems: [
+    //     ...(user?.role === "DEALER"
+    //       ? [{ name: "Insurance", path: "/payment/dealer-payments", pro: false }]
+    //       : []),
+    //     ...(user?.role === "DISTRIBUTOR"
+    //       ? [{ name: "Dealer", path: "/payment/distributor-payments", pro: false }]
+    //       : []),
+    //     ...(user?.role === "SUPERADMIN"
+    //       ? [{ name: "Distributor", path: "/payment/superadmin", pro: false }]
+    //       : []),
+    //   ],
+    // },
+      {
+      name: "Partners",
+      icon: <DollarLineIcon/>,
       // subItems: [{ name: "Dealer List", path: "/payment/dealer-payments", pro: false },
       //   { name: "Distributor List", path: "/payment/distributor-payments", pro: false },
       //   { name: "SuperAdmin List", path: "/payment/superadmin", pro: false }
       // ],
       subItems: [
-        ...(user?.role === "DEALER"
-          ? [{ name: "Dealer List", path: "/payment/dealer-payments", pro: false }]
-          : []),
         ...(user?.role === "DISTRIBUTOR"
-          ? [{ name: "Distributor List", path: "/payment/distributor-payments", pro: false }]
+          ? [{ name: " Dealer creation", path: "/create-dealer", pro: false },{ name: "Dealer", path: "/payment/distributor-payments", pro: false }]
           : []),
         ...(user?.role === "SUPERADMIN"
-          ? [{ name: "SuperAdmin List", path: "/payment/superadmin", pro: false }]
+          ? [{ name: " Distributor creation", path: "/create-distributor", pro: false },{ name: "Distributor", path: "/payment/superadmin", pro: false }]
           : []),
       ],
     },
     {
-      name: "Policy Maping",
-      icon: <TableIcon />,
-      subItems: [{ name: " Export Policies", path: "/policies", pro: false }],
+      name: "Allocate Policy",
+      icon: <CopyIcon />,
+      subItems: [{ name: "Allocate Policy", path: "/policies", pro: false }],
      
   
     },
      {
       name: "Payment History",
-      icon: <TableIcon />,
-      subItems: [{ name: "Payment history", path: "/payment/history", pro: false }],
-     
+      icon: <TimeIcon />,
+      subItems: [
+             ...(user?.role === "DISTRIBUTOR"
+          ? [{ name: "Payment history", path: "/payment/history", pro: false }]
+          : []),
+        ...(user?.role === "SUPERADMIN"
+          ? [{ name: "Payment history", path: "/payment/superadmin-history", pro: false }]
+          : []),
+      ],
   
     },
     {
-      name: "Plans",
+      name: "Sales",
       icon: <TableIcon />,
-      subItems: [{ name: "Plans", path: "/plans", pro: false }],
+      subItems: [{ name: "Set Sales Target", path: "/plans", pro: false }],
      
   
     },
@@ -375,11 +409,13 @@ console.log('data',user)
         item.name === "Policy" ||
         item.name === "Distributor" ||
         item.name === "Dealer" ||
-        item.name === "Policy Maping" ||
+        item.name === "Allocate Policy" ||
         item.name === "Payments" ||
+                item.name === "Partners" ||
+
         item.name === "Payment History" ||
 
-       item.name === "Plans"
+       item.name === "Sales"
 
       ) {
         return false;
@@ -391,8 +427,8 @@ console.log('data',user)
         item.name === "Distributor" ||
         item.name === "Insurance" ||
         item.name === "Customer" ||
-        item.name === "Policy Maping" ||
-        item.name === "Plans"
+        item.name === "Allocate Policy" ||
+        item.name === "Sales"
 
       ) {
         return false;
@@ -402,8 +438,7 @@ console.log('data',user)
       if (
         item.name === "Dealer" ||
         item.name === "Insurance" ||
-        item.name === "Customer" ||
-        item.name === "Payment History"
+        item.name === "Customer" 
  
       ) {
         return false;

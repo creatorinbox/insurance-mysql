@@ -26,7 +26,11 @@ interface Policy {
   createdAt: Date;
   updatedAt: Date;
 }
-export default function PolicyTableOne() {
+interface PolicyTableOneProps {
+  userRole: string | null;
+}
+// export default function PolicyTableOne() {
+export default function PolicyTableOne({ userRole }: PolicyTableOneProps) {
   const [policies, setPolicies] = useState<Policy[]>([]);
   //const CURRENT_USER_ROLE = "SUPERADMIN";
 
@@ -58,6 +62,55 @@ export default function PolicyTableOne() {
   //   }
   // };
  return (
+  // <div className="space-y-10">
+  //   {Object.entries(
+  //     policies.reduce((acc, policy) => {
+  //       if (!acc[policy.category]) acc[policy.category] = [];
+  //       acc[policy.category].push(policy);
+  //       return acc;
+  //     }, {} as Record<string, Policy[]>)
+  //   ).map(([category, categoryPolicies]) => (
+  //     <div key={category}>
+  //       <h2 className="text-lg font-semibold mb-2">{category} Policies</h2>
+  //       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+  //         <div className="max-w-full overflow-x-auto">
+  //           <div className="min-w-[1102px]">
+  //             <Table>
+  //               <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+  //                 <TableRow>
+  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ADLD</TableCell>
+  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">COMBO</TableCell>
+  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Min Amount</TableCell>
+  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Max Amount</TableCell>
+  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ew1Year</TableCell>
+  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ew2Year</TableCell>
+  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ew3Year</TableCell>
+  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Created Date</TableCell>
+  //                 </TableRow>
+  //               </TableHeader>
+  //               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+  //                 {categoryPolicies.map((policy) => (
+  //                   <TableRow key={policy.id}>
+  //                     <TableCell className="px-4 py-3">{policy.adld}</TableCell>
+  //                     <TableCell className="px-4 py-3">{policy.combo1Year}</TableCell>
+  //                     <TableCell className="px-4 py-3">{policy.minAmount}</TableCell>
+  //                     <TableCell className="px-4 py-3">{policy.maxAmount}</TableCell>
+  //                     <TableCell className="px-4 py-3">{policy.ew1Year}</TableCell>
+  //                     <TableCell className="px-4 py-3">{policy.ew2Year}</TableCell>
+  //                     <TableCell className="px-4 py-3">{policy.ew3Year}</TableCell>
+  //                     <TableCell className="px-4 py-3">
+  //                       {new Date(policy.createdAt).toLocaleDateString()}
+  //                     </TableCell>
+  //                   </TableRow>
+  //                 ))}
+  //               </TableBody>
+  //             </Table>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   ))}
+  // </div>
   <div className="space-y-10">
     {Object.entries(
       policies.reduce((acc, policy) => {
@@ -67,36 +120,48 @@ export default function PolicyTableOne() {
       }, {} as Record<string, Policy[]>)
     ).map(([category, categoryPolicies]) => (
       <div key={category}>
-        <h2 className="text-lg font-semibold mb-2">{category} Policies</h2>
+        <h2 className="text-lg font-semibold mb-2">{category}</h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
           <div className="max-w-full overflow-x-auto">
             <div className="min-w-[1102px]">
               <Table>
                 <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                   <TableRow>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ADLD</TableCell>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">COMBO</TableCell>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Min Amount</TableCell>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Max Amount</TableCell>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ew1Year</TableCell>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ew2Year</TableCell>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ew3Year</TableCell>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Created Date</TableCell>
+                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Invoice Value</TableCell>
+                   
+
+  {userRole === "SUPERADMIN" ? (
+    <>
+        <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ADLD-1Yr</TableCell>
+
+                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">EW-1Yr</TableCell>
+                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">EW-2Yrs</TableCell>
+                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">EW-3Yrs</TableCell>
+       <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">COMBO-1Yr</TableCell>
+                 </> ) : (<>
+      <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Max-1Yr</TableCell>
+
+                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Pro-1Yr</TableCell>
+                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Pro-2Yrs</TableCell>
+                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Pro-3Yrs</TableCell>
+       <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Shield-1Yr</TableCell>
+     </> )}
+                  
+                    {/* <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Created Date</TableCell> */}
                   </TableRow>
                 </TableHeader>
                 <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                   {categoryPolicies.map((policy) => (
                     <TableRow key={policy.id}>
+                      <TableCell className="px-4 py-3">₹ {policy.minAmount/1000}K - ₹ {policy.maxAmount/1000}K</TableCell>
                       <TableCell className="px-4 py-3">{policy.adld}</TableCell>
-                      <TableCell className="px-4 py-3">{policy.combo1Year}</TableCell>
-                      <TableCell className="px-4 py-3">{policy.minAmount}</TableCell>
-                      <TableCell className="px-4 py-3">{policy.maxAmount}</TableCell>
                       <TableCell className="px-4 py-3">{policy.ew1Year}</TableCell>
                       <TableCell className="px-4 py-3">{policy.ew2Year}</TableCell>
                       <TableCell className="px-4 py-3">{policy.ew3Year}</TableCell>
-                      <TableCell className="px-4 py-3">
+                      <TableCell className="px-4 py-3">{policy.combo1Year}</TableCell>
+                      {/* <TableCell className="px-4 py-3">
                         {new Date(policy.createdAt).toLocaleDateString()}
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   ))}
                 </TableBody>

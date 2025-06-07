@@ -1,3 +1,4 @@
+// src/app/api/payments/confirm/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromToken } from "@/lib/getUserFromToken";
@@ -7,13 +8,13 @@ export async function POST(req: NextRequest) {
   try {
     const user = await getUserFromToken();
 
-    if (!user || user.role !== "DISTRIBUTOR") {
+    if (!user || user.role !== "DEALER") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    const { orderId, paymentId, signature, base, amount, discount, dealerIds } = await req.json();
+    const { orderId, paymentId, signature, base, amount, discount,dealerId } = await req.json();
 
-    // ✅ Verify Razorpay Signature
+    // 1. Verify Razorpay signature
     const generatedSignature = crypto
       .createHmac("sha256", "kfVhUIBTMccuFSx8mMHT5oRS")
       .update(orderId + "|" + paymentId)
@@ -23,27 +24,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 
-    // ✅ Store Bulk Payment Records
-    await prisma.payment.createMany({
-      data: dealerIds.map((dealerId: number) => ({
-        dealerId,
-        amount: parseFloat(amount) / dealerIds.length, // Split amount across dealers if needed
-        baseAmount: parseFloat(base) / dealerIds.length,
-        discount: parseFloat(discount) / dealerIds.length,
+    // 2. Save Payment Record
+    await prisma.payment.create({
+      data: {
+        dealerId: parseInt(user.id,10),
+        amount: parseFloat(amount),
+        baseAmount: parseFloat(base),
+        discount: parseFloat(discount),
         razorpayOrderId: orderId,
         razorpayPaymentId: paymentId,
         status: "PAID",
-      })),
+      },
     });
 
-    // ✅ Bulk Update Insurance Records
+    // 3. Update Insurance Records
     await prisma.insurance.updateMany({
       where: {
-        userId: { in: dealerIds }, // ✅ Update multiple dealers
+        userId: dealerId,
         paidstatus: { not: "PAID" },
       },
       data: {
-        dueamount: 0,
+        dueamount: parseFloat("0"),
         paidstatus: "PAID",
       },
     });

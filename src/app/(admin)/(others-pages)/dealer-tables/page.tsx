@@ -1,4 +1,5 @@
 "use client";
+import { Suspense } from 'react';
 
 import { useEffect, useState } from "react";
 interface Dealer {
@@ -64,19 +65,33 @@ export default function DealersPage() {
           <tbody>
             {dealers.map((d) => (
               <tr key={d.id} className="border-t">
+                <Suspense fallback={<p>Loading feed...</p>}>
                 <td className="p-2">{d.dealerName}</td>
+                
                 <td className="p-2">{d.dealerCode}</td>
+
                 <td className="p-2">{d.dealerLocation}</td>
+
                 <td className="p-2">{d.salesChannel}</td>
+
                 <td className="p-2">{d.vas}</td>
+
                 <td className="p-2">{d.businessPartnerName}</td>
+
                 <td className="p-2">{d.businessPartnerCategory}</td>
+
                 <td className="p-2">{d.lanNumber}</td>
+
                 <td className="p-2">{new Date(d.policyBookingDate).toLocaleDateString()}</td>
+
                 <td className="p-2">{d.membershipFees}</td>
+
                 <td className="p-2">{d.brokerDetails}</td>
+
                 <td className="p-2">{d.locationCode}</td>
+
                 <td className="p-2">{d.loanApiIntegration}</td>
+                </Suspense>
               </tr>
             ))}
           </tbody>

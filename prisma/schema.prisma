@@ -228,7 +228,16 @@ model user {
   status    String
   roleid    String
 }
-
+model CompanyBranding {
+  id          Int      @id @default(autoincrement())
+  companyName String   
+  planName    String   
+  logoUrl     String?  
+  colorCode   String   
+  kitName     String?  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
 enum plan_role {
   DEALER
   DISTRIBUTOR

@@ -1,47 +1,65 @@
 "use client";
-import ComponentCard from "@/components/common/ComponentCard";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+//import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import PolicyTableOne from "@/components/tables/PolicyTableOne";
 import ImportPolicyModal from "@/components/common/ImportPolicyModal";
-// import { Metadata } from "next";
-import React from "react";
-//import Link from "next/link";
-import { useState } from "react";
 
-// export const metadata: Metadata = {
-//   title: "Next.js Basic Table | TailAdmin - Next.js Dashboard Template",
-//   description:
-//     "This is Next.js Basic Table  page for TailAdmin  Tailwind CSS Admin Dashboard Template",
-//   // other metadata
-// };
 export default function BasicTables() {
-   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null); // Track user role
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/me", {
+          method: "GET",
+          credentials: "include", // Ensures cookies/session are sent
+        });
+
+        if (!res.ok) {
+          throw new Error("User not authenticated");
+        }
+
+        const userData = await res.json();
+
+        if (userData && userData.role) {
+          setUserRole(userData.role); // Store the user role
+        } else {
+          router.push("/signin"); // Redirect if authentication fails
+        }
+      } catch (error) {
+        console.error("Auth Check Failed:", error);
+        router.push("/signin");
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Policy List" />
       <div className="space-y-6">
-      
-        <ComponentCard title="Policy">
-        <div className="flex justify-end mb-4">
-            {/* <Link 
-              href="/policy-pricing" 
-              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition"
-            >
-              Create Policy
-            </Link> */}
-             <button
+        <div className="flex justify-between mb-4">
+          <PageBreadcrumb pageTitle="Products" />
+
+          {/* Show "Import Products" button only if userRole is "superadmin" */}
+          {userRole === "SUPERADMIN" && (
+            <button
               onClick={() => setIsModalOpen(true)}
               className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition"
             >
-              Import Policy Plan
+              Import Products
             </button>
-          </div>
+          )}
+        </div>
 
-          <PolicyTableOne />
-        </ComponentCard>
+        <PolicyTableOne userRole={userRole} />
       </div>
-       {/* Modal for Import */}
+
+      {/* Modal for Import */}
       <ImportPolicyModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );

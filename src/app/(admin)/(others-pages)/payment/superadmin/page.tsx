@@ -7,7 +7,11 @@ interface SuperadminPaymentEntry {
   distributorId: string;
   distributorName: string;
   salesAmount: number;
-  status: "ACTIVE" | "BLOCKED" | "TERMINATED";
+     dueAmount:number;
+     mobile:string;
+     city:string;
+     contactPerson:string;
+  status: "ACTIVE" | "BLOCKED" | "TERMINATED" | "pending";
 }
 export default function SuperadminPaymentsPage() {
   const [distributors, setDistributors] = useState<SuperadminPaymentEntry[]>([]);
@@ -46,9 +50,14 @@ export default function SuperadminPaymentsPage() {
         <thead>
           <tr className="bg-gray-200 text-left">
             <th className="p-2">Distributor Name</th>
+            <th className="p-2">Mobile</th>
+                        <th className="p-2">City</th>
+            <th className="p-2">Contact Person</th>
             <th className="p-2">Sales Amount</th>
-            {/* <th className="p-2">Due Amount</th> */}
+           <th className="p-2">Due Amount</th>
             <th className="p-2">View Distributor</th>
+                        <th className="p-2">Status</th>
+
             <th className="p-2">Action</th>
 
           </tr>
@@ -57,8 +66,13 @@ export default function SuperadminPaymentsPage() {
           {distributors.map((distributor, i: number) => (
             <tr key={i} className="border-b">
               <td className="p-2">{distributor.distributorName}</td>
-              <td className="p-2">₹ {distributor.salesAmount}</td>
-              {/* <td className="p-2">₹ {distributor.dueAmount}</td> */}
+                            <td className="p-2">{distributor.mobile}</td>
+              <td className="p-2">{distributor.city}</td>
+              <td className="p-2">{distributor.contactPerson}</td>
+              {/* <td className="p-2">₹ {distributor.salesAmount}</td>
+             <td className="p-2">₹ {distributor.dueAmount}</td>  */}
+             <td className="p-2">{distributor.salesAmount ? `₹ ${distributor.salesAmount}` : "-"}</td>
+<td className="p-2">{distributor.dueAmount ? `₹ ${distributor.dueAmount}` : "-"}</td>
               <td className="p-2">
                 <button
                   onClick={() => router.push(`/payment/superadmin/view-insurance/${distributor.distributorId}`)}
@@ -67,6 +81,7 @@ export default function SuperadminPaymentsPage() {
                   View
                 </button>
               </td>
+              <td className="p-2">{distributor.status}</td> 
               <td className="p-2 space-x-2">
   {distributor.status === "ACTIVE" && (
     <>
@@ -93,10 +108,23 @@ export default function SuperadminPaymentsPage() {
       Activate
     </button>
   )}
+   {distributor.status === "pending" && (
+    <button
+      onClick={() => handleAction(distributor.distributorId, "active")}
+      className="px-2 py-1 text-xs text-white bg-green-600 rounded"
+    >
+      Approve
+    </button>
+  )}
 
   {distributor.status === "TERMINATED" && (
     <span className="text-xs text-gray-500">Terminated</span>
   )}
+   <button
+      className="px-2 py-1 text-xs text-white bg-green-600 rounded"
+    >
+      Edit
+    </button>
 </td>
             </tr>
           ))}

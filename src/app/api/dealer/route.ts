@@ -22,6 +22,9 @@ export async function POST(req: NextRequest) {
      let user: { id: number; role: string };
      try {
        user = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+         if (!user) {
+      return NextResponse.json({ error: "Unauthorized - User missing" }, { status: 401 });
+    }
      } catch {
        return NextResponse.json({ message: "Invalid token" }, { status: 403 });
      }

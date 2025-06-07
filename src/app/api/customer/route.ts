@@ -39,6 +39,14 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+     const customer = await prisma.customer.findUnique({
+      where: { mobile },
+      select: { mobile: true, customerName: true, address1: true, city: true, state: true },
+    });
+
+    if (!customer) {
+      return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+    }
     const insurances = await prisma.insurance.findMany({
       where: { mobile },
       orderBy: { createdAt: "desc" },
@@ -51,6 +59,13 @@ export async function GET(req: NextRequest) {
         expiryDate: true,
         policyType: true, // Ensure policyType is included for lookup
         invoiceAmount: true,
+        kitNumber:true,
+        policyStatus:true,
+        userId:true,
+  invoiceNo  :true,            
+  imeiNumber :true,   
+  modelNo:true,        
+
       },
     });
 
@@ -61,7 +76,7 @@ export async function GET(req: NextRequest) {
         const invoiceAmount = parseFloat(String(i.invoiceAmount ?? "0"));
 
         let policyPrice = null;
-
+        let dealerName = null;
         if (validColumns.includes(ewYear)) {
           const plan = await prisma.policyPricing.findFirst({
             where: {
@@ -82,10 +97,21 @@ export async function GET(req: NextRequest) {
             }
           }
         }
+ // Fetch dealer name using userId
+        if (i.userId) {
+          const dealer = await prisma.dealer.findUnique({
+            where: { id: i.userId },
+            select: { dealerName: true },
+          });
 
+          dealerName = dealer?.dealerName || "Unknown Dealer";
+        }
+        
         return {
           ...i,
           policyPrice,
+          dealerName,
+          customer,
         };
       })
     );

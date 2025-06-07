@@ -99,7 +99,7 @@ export async function GET(req: Request) {
     // 1. Find all distributors under superadmin
     const distributors = await prisma.distributor.findMany({
       where: { userId: parseInt(user.id,10) },
-      select: { id: true, name: true, status: true },
+      select: { id: true, name: true, status: true, mobile:true,city:true,contactPerson:true },
     });
 
     const distributorIds = distributors.map((d) => d.id);
@@ -148,7 +148,7 @@ export async function GET(req: Request) {
     // 5. Group by distributor
     const distributorSummary: Record<
       string,
-      { distributorId: number; distributorName: string; salesAmount: number; dueAmount: number; status: string }
+      { distributorId: number; distributorName: string; salesAmount: number; dueAmount: number; status: string; mobile:string;city:string;contactPerson:string; }
     > = {};
 
     for (const dealer of dealers) {
@@ -160,6 +160,9 @@ export async function GET(req: Request) {
         distributorSummary[distributorId] = {
           distributorId,
           distributorName: distributor.name,
+          mobile:distributor.mobile,
+          city:distributor.city,
+          contactPerson:distributor.contactPerson,
           salesAmount: 0,
           dueAmount: 0,
           status: distributor.status,

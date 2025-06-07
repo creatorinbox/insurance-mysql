@@ -31,25 +31,26 @@ export default async function DashboardPage() {
           userId: dealer.id,
           policyBookingDate: { gte: startDate, lte: lastDay },
         },
-        select: { invoiceAmount: true },
+        select: { invoiceAmount: true,dueamount:true },
       });
 
       for (const ins of insurances) {
         invoiceTotal += ins.invoiceAmount ?? 0;
+        dueTotal += ins.dueamount ?? 0;
       }
 
-      const payments = await prisma.payment.findMany({
-        where: {
-          dealerId: dealer.id,
-          createdAt: { gte: startDate, lte: lastDay },
-        },
-      });
+      // const payments = await prisma.payment.findMany({
+      //   where: {
+      //     dealerId: dealer.id,
+      //     createdAt: { gte: startDate, lte: lastDay },
+      //   },
+      // });
 
-      for (const p of payments) {
-        paidAmount += p.baseAmount;
-      }
+      // for (const p of payments) {
+      //   paidAmount += p.baseAmount;
+      // }
 
-      dueTotal = invoiceTotal - paidAmount;
+      //dueTotal = invoiceTotal - paidAmount;
     }
   }
 

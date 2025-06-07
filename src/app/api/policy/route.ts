@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import {  NextResponse } from "next/server";
 //import { ObjectId } from "mongodb";
 //import jwt from "jsonwebtoken";
-//import { getUserFromToken } from "@/lib/getUserFromToken";
+import { getUserFromToken } from "@/lib/getUserFromToken";
 
 // export async function POST(req: NextRequest) {
 //   try {
@@ -123,6 +123,11 @@ import {  NextResponse } from "next/server";
 // }
 export async function GET() {
   try {
+     const user = await getUserFromToken();
+    
+        if (!user) {
+          return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        }
     const policies = await prisma.policyPricing.findMany({
       orderBy: {
         createdAt: 'desc',

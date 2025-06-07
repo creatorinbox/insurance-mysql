@@ -3,18 +3,28 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PayNowPopup from "@/components/PayNowPopup";
+
 interface DistributorPayment {
   id: number;
   dealerName: string;
   salesAmount: number;
   dueAmount: number;
-  status: "ACTIVE" | "BLOCKED" | "TERMINATED";
+  businessPartnerName: string;
+  dealerLocation: string;
+  status: "ACTIVE" | "BLOCKED" | "TERMINATED" | "pending";
   effectiveDeduction: number;
   finalDue: number;
 }
-
+interface BulkPaymentData {
+  baseAmount: number;
+  discount: number;
+  payableAmount: number;
+  dealerIds: number[];
+}
 export default function DistributorPaymentsPage() {
-  const [dealers, setDealers] = useState<DistributorPayment[]>([]);
+    const [dealers, setDealers] = useState<DistributorPayment[]>([]);
+  const [selectedDealers, setSelectedDealers] = useState<number[]>([]);
+const [bulkPaymentData, setBulkPaymentData] = useState<BulkPaymentData | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -23,7 +33,44 @@ export default function DistributorPaymentsPage() {
       .then((res) => setDealers(res));
   }, []);
 
-  const handleAction = async (id: number, action: "block" | "terminate"| "active") => {
+  // ✅ Handle selection of dealers for bulk payment
+  const toggleSelection = (dealerId: number) => {
+    setSelectedDealers((prev) =>
+      prev.includes(dealerId) ? prev.filter((id) => id !== dealerId) : [...prev, dealerId]
+    );
+  };
+
+
+  // ✅ Calculate Bulk Payment Data
+  const handleBulkPayNow = () => {
+    if (selectedDealers.length === 0) {
+      alert("Please select dealers for bulk payment.");
+      return;
+    }
+
+    const totalBaseAmount = selectedDealers.reduce((acc, dealerId) => {
+      const dealer = dealers.find((d) => d.id === dealerId);
+      return acc + (dealer?.salesAmount || 0);
+    }, 0);
+
+    const totalPayableAmount = selectedDealers.reduce((acc, dealerId) => {
+      const dealer = dealers.find((d) => d.id === dealerId);
+      return acc + (dealer?.finalDue || 0);
+    }, 0);
+
+    const totalDiscount = selectedDealers.reduce((acc, dealerId) => {
+      const dealer = dealers.find((d) => d.id === dealerId);
+      return acc + (dealer?.effectiveDeduction || 0);
+    }, 0);
+
+    setBulkPaymentData({
+      baseAmount: totalBaseAmount,
+      discount: totalDiscount,
+      payableAmount: totalPayableAmount,
+      dealerIds: selectedDealers,
+    });
+  };
+const handleAction = async (id: number, action: "block" | "terminate"| "active") => {
     const confirmMsg = `Are you sure you want to ${action} this dealer?`;
     if (!window.confirm(confirmMsg)) return;
 
@@ -43,43 +90,95 @@ export default function DistributorPaymentsPage() {
       alert(`Failed to ${action} dealer.`);
     }
   };
-const handleMarkPaid = async (dealerId: number) => {
-  const confirm = window.confirm("Are you sure you want to mark all dues as paid?");
-  if (!confirm) return;
+  // ✅ Handle bulk payment action
+  // const handleBulkPayment = async () => {
+  //   if (selectedDealers.length === 0) {
+  //     alert("Please select dealers for bulk payment.");
+  //     return;
+  //   }
 
-  const res = await fetch(`/api/mark-paid/${dealerId}`, {
-    method: "POST",
-    credentials: "include",
-  });
+  //   const confirm = window.confirm("Are you sure you want to process payment for selected dealers?");
+  //   if (!confirm) return;
 
-  if (res.ok) {
-    alert("Marked as paid successfully");
-    const updated = await fetch("/api/distributor-payments", { credentials: "include" });
-    const data = await updated.json();
-    setDealers(data);
-  } else {
-    alert("Failed to mark as paid.");
-  }
-};
+  //   const res = await fetch("/api/bulk-paynow", {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({ dealerIds: selectedDealers }),
+  //     credentials: "include",
+  //   });
+
+  //   if (res.ok) {
+  //     alert("Bulk payment processed successfully!");
+  //     setSelectedDealers([]); // Clear selection after payment
+  //     const updated = await fetch("/api/distributor-payments", { credentials: "include" });
+  //     const data = await updated.json();
+  //     setDealers(data);
+  //   } else {
+  //     alert("Failed to process bulk payment.");
+  //   }
+  // };
+
   return (
     <div className="p-8">
       <h1 className="text-xl font-semibold mb-4">Distributor Payments</h1>
+
+      {/* ✅ Bulk Pay Button */}
+      {/* <button
+        onClick={handleBulkPayment}
+        className={`mb-4 px-4 py-2 text-white rounded ${selectedDealers.length > 0 ? "bg-blue-600" : "bg-gray-400 cursor-not-allowed"}`}
+        disabled={selectedDealers.length === 0}
+      >
+        Pay Now (Bulk)
+      </button> */}
+  <button
+        onClick={handleBulkPayNow}
+        className={`mb-4 px-4 py-2 text-white rounded ${selectedDealers.length > 0 ? "bg-blue-600" : "bg-gray-400 cursor-not-allowed"}`}
+        disabled={selectedDealers.length === 0}
+      >
+        Pay Now (Bulk)
+      </button>
+
+      {bulkPaymentData && (
+        <PayNowPopup
+          baseAmount={bulkPaymentData.baseAmount}
+          discount={bulkPaymentData.discount}
+          payableAmount={bulkPaymentData.payableAmount}
+          dealerIds={bulkPaymentData.dealerIds} // ✅ Handle bulk payment
+          bulkPayment={true}
+        />
+      )}
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-gray-200 text-left">
+            <th className="p-2">Select</th>
             <th className="p-2">Dealer Name</th>
+            <th className="p-2">Dealer Location</th>
+            <th className="p-2">Business Partner Name</th>
             <th className="p-2">Sales Amount</th>
             <th className="p-2">Due Amount</th>
             <th className="p-2">View Dealer</th>
-            <th className="p-2">Action</th>
+            <th className="p-2">Status</th>
+            <th className="p-2">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {dealers.map((dealer, i) => (
-            <tr key={i} className="border-b">
+          {dealers.map((dealer) => (
+            <tr key={dealer.id} className="border-b">
+              {/* ✅ Checkbox for selection */}
+              <td className="p-2">
+                <input
+                  type="checkbox"
+                  checked={selectedDealers.includes(dealer.id)}
+                  onChange={() => toggleSelection(dealer.id)}
+                />
+              </td>
+
               <td className="p-2">{dealer.dealerName}</td>
-              <td className="p-2">₹ {dealer.salesAmount}</td>
-              <td className="p-2">₹ {dealer.dueAmount}</td>
+              <td className="p-2">{dealer.dealerLocation}</td>
+              <td className="p-2">{dealer.businessPartnerName}</td>
+              <td className="p-2">{dealer.salesAmount ? `₹ ${dealer.salesAmount}` : "-"}</td>
+              <td className="p-2">{dealer.dueAmount ? `₹ ${dealer.dueAmount}` : "-"}</td>
+
               <td className="p-2">
                 <button
                   onClick={() => router.push(`/dealer/insurance/${dealer.id}`)}
@@ -88,87 +187,65 @@ const handleMarkPaid = async (dealerId: number) => {
                   View
                 </button>
               </td>
-              {/* <td className="p-2 space-x-2">
-  {dealer.status === "ACTIVE" && (
-    <>
-      <button
-        onClick={() => handleAction(dealer.id, "block")}
-        className="px-2 py-1 text-xs text-white bg-yellow-500 rounded"
-      >
-        Block
-      </button>
-      <button
-        onClick={() => handleAction(dealer.id, "terminate")}
-        className="px-2 py-1 text-xs text-white bg-red-600 rounded"
-      >
-        Terminate
-      </button>
-    </>
-  )}
 
-  {dealer.status === "BLOCKED" && (
-    <button
-      onClick={() => handleAction(dealer.id, "active")}
-      className="px-2 py-1 text-xs text-white bg-green-600 rounded"
-    >
-      Activate
-    </button>
-  )}
+              <td className="p-2">{dealer.status}</td>
 
-  {dealer.status === "TERMINATED" && (
-    <span className="text-xs text-gray-500">Terminated</span>
-  )}
-</td> */}
-<td className="p-2 space-x-2">
-  {dealer.status === "ACTIVE" && (
-    <>
-      <button
-        onClick={() => handleAction(dealer.id, "block")}
-        className="px-2 py-1 text-xs text-white bg-yellow-500 rounded"
-      >
-        Block
-      </button>
-      <button
-        onClick={() => handleAction(dealer.id, "terminate")}
-        className="px-2 py-1 text-xs text-white bg-red-600 rounded"
-      >
-        Terminate
-      </button>
-    </>
-  )}
+              <td className="p-2 space-x-2">
+                {dealer.status === "ACTIVE" && (
+                  <>
+                    <button
+                      onClick={() => handleAction(dealer.id, "block")}
+                      className="px-2 py-1 text-xs text-white bg-yellow-500 rounded"
+                    >
+                      Block
+                    </button>
+                    <button
+                      onClick={() => handleAction(dealer.id, "terminate")}
+                      className="px-2 py-1 text-xs text-white bg-red-600 rounded"
+                    >
+                      Terminate
+                    </button>
+                  </>
+                )}
 
-  {dealer.status === "BLOCKED" && (
-    <button
-      onClick={() => handleAction(dealer.id, "active")}
-      className="px-2 py-1 text-xs text-white bg-green-600 rounded"
-    >
-      Activate
-    </button>
-  )}
+                {dealer.status === "BLOCKED" && (
+                  <button
+                    onClick={() => handleAction(dealer.id, "active")}
+                    className="px-2 py-1 text-xs text-white bg-green-600 rounded"
+                  >
+                    Activate
+                  </button>
+                )}
 
-  {dealer.status === "TERMINATED" && (
-    <span className="text-xs text-gray-500">Terminated</span>
-  )}
+                {dealer.status === "pending" && (
+                  <button
+                    onClick={() => handleAction(dealer.id, "active")}
+                    className="px-2 py-1 text-xs text-white bg-green-600 rounded"
+                  >
+                    Approve
+                  </button>
+                )}
 
-  {dealer.dueAmount > 0 && (
-        <div>
-    <button
-      onClick={() => handleMarkPaid(dealer.id)}
-      className="px-2 py-1 text-xs text-white bg-blue-600 rounded"
-    >
-      Mark as Paid
-    </button>
+                {dealer.status === "TERMINATED" && (
+                  <span className="text-xs text-gray-500">Terminated</span>
+                )}
 
-     <PayNowPopup
+                {dealer.dueAmount > 0 && (
+                   <PayNowPopup
                     baseAmount={dealer.salesAmount}
-                    dealerId={dealer.id}
+                    dealerIds={[dealer.id]} // ✅ Handle single payments
                     discount={dealer.effectiveDeduction}
                     payableAmount={dealer.finalDue}
+                    bulkPayment={false}
                   />
-                  </div>
-  )}
-</td>
-
+                )}
+                <button
+      className="px-2 py-1 text-xs text-white bg-green-600 rounded"
+      onClick={() => router.push(`/create-dealer/${dealer.id}`)}
+    >
+      Edit
+    </button>
+              </td>
             </tr>
           ))}
         </tbody>
