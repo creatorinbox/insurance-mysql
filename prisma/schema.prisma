@@ -141,7 +141,9 @@ model insurance {
   businessPartnerCategory String
   lanNumber               String
   policyBookingDate       DateTime
-  membershipFees          String
+  membershipFees          Float?
+  SalesAmount             Float?
+
   brokerDetails           String
   locationCode            String
   loanApiIntegration      String
@@ -163,6 +165,7 @@ model payment {
   remarks           String?
   razorpayOrderId   String?
   razorpayPaymentId String?
+  invoiceNumber     String
   status            String   @default("PENDING")   
   createdAt         DateTime @default(now())
 }

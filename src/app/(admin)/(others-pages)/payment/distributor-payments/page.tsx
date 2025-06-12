@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PayNowPopup from "@/components/PayNowPopup";
-
+import "@fortawesome/fontawesome-free/css/all.min.css";
 interface DistributorPayment {
   id: number;
   dealerName: string;
@@ -14,12 +14,18 @@ interface DistributorPayment {
   status: "ACTIVE" | "BLOCKED" | "TERMINATED" | "pending";
   effectiveDeduction: number;
   finalDue: number;
+  gst:number;
+  sgst:number;
 }
 interface BulkPaymentData {
   baseAmount: number;
   discount: number;
   payableAmount: number;
   dealerIds: number[];
+  gst:number;
+  sgst:number;
+    dueAmount: number;
+
 }
 export default function DistributorPaymentsPage() {
     const [dealers, setDealers] = useState<DistributorPayment[]>([]);
@@ -62,12 +68,27 @@ const [bulkPaymentData, setBulkPaymentData] = useState<BulkPaymentData | null>(n
       const dealer = dealers.find((d) => d.id === dealerId);
       return acc + (dealer?.effectiveDeduction || 0);
     }, 0);
+    const dueAmount = selectedDealers.reduce((acc, dealerId) => {
+      const dealer = dealers.find((d) => d.id === dealerId);
+      return acc + (dealer?.dueAmount || 0);
+    }, 0);
+    const gst = selectedDealers.reduce((acc, dealerId) => {
+      const dealer = dealers.find((d) => d.id === dealerId);
+      return acc + (dealer?.gst || 0);
+    }, 0);
+    const sgst = selectedDealers.reduce((acc, dealerId) => {
+      const dealer = dealers.find((d) => d.id === dealerId);
+      return acc + (dealer?.sgst || 0);
+    }, 0);
 
     setBulkPaymentData({
       baseAmount: totalBaseAmount,
       discount: totalDiscount,
       payableAmount: totalPayableAmount,
       dealerIds: selectedDealers,
+      gst:gst,
+      sgst:sgst,
+      dueAmount:dueAmount,
     });
   };
 const handleAction = async (id: number, action: "block" | "terminate"| "active") => {
@@ -145,6 +166,9 @@ const handleAction = async (id: number, action: "block" | "terminate"| "active")
           payableAmount={bulkPaymentData.payableAmount}
           dealerIds={bulkPaymentData.dealerIds} // ✅ Handle bulk payment
           bulkPayment={true}
+           dueAmount={bulkPaymentData.dueAmount}
+                    gst={bulkPaymentData.gst}
+                    sgst={bulkPaymentData.sgst}
         />
       )}
       <table className="w-full border-collapse">
@@ -153,10 +177,9 @@ const handleAction = async (id: number, action: "block" | "terminate"| "active")
             <th className="p-2">Select</th>
             <th className="p-2">Dealer Name</th>
             <th className="p-2">Dealer Location</th>
-            <th className="p-2">Business Partner Name</th>
             <th className="p-2">Sales Amount</th>
             <th className="p-2">Due Amount</th>
-            <th className="p-2">View Dealer</th>
+            <th className="p-2">View Dealer Insurance</th>
             <th className="p-2">Status</th>
             <th className="p-2">Actions</th>
           </tr>
@@ -175,9 +198,8 @@ const handleAction = async (id: number, action: "block" | "terminate"| "active")
 
               <td className="p-2">{dealer.dealerName}</td>
               <td className="p-2">{dealer.dealerLocation}</td>
-              <td className="p-2">{dealer.businessPartnerName}</td>
-              <td className="p-2">{dealer.salesAmount ? `₹ ${dealer.salesAmount}` : "-"}</td>
-              <td className="p-2">{dealer.dueAmount ? `₹ ${dealer.dueAmount}` : "-"}</td>
+              <td className="p-2">{dealer.salesAmount ? `₹ ${dealer.salesAmount}` : ""}</td>
+              <td className="p-2">{dealer.dueAmount ? `₹ ${dealer.dueAmount}` : "Paid"}</td>
 
               <td className="p-2">
                 <button
@@ -188,8 +210,13 @@ const handleAction = async (id: number, action: "block" | "terminate"| "active")
                 </button>
               </td>
 
-              <td className="p-2">{dealer.status}</td>
-
+              {/* <td className="p-2">{dealer.status}</td> */}
+<td className="p-2">
+  {dealer.status === "ACTIVE" && <i className="fas fa-check-circle text-green-500"></i>}
+  {dealer.status === "pending" && <i className="fas fa-hourglass-half text-yellow-500"></i>}
+  {dealer.status === "BLOCKED" && <i className="fas fa-ban text-red-500"></i>}
+  {dealer.status === "TERMINATED" && <i className="fas fa-times-circle text-gray-500"></i>}
+</td>
               <td className="p-2 space-x-2">
                 {dealer.status === "ACTIVE" && (
                   <>
@@ -237,6 +264,10 @@ const handleAction = async (id: number, action: "block" | "terminate"| "active")
                     discount={dealer.effectiveDeduction}
                     payableAmount={dealer.finalDue}
                     bulkPayment={false}
+                    dueAmount={dealer.dueAmount}
+                    gst={dealer.gst}
+                    sgst={dealer.sgst}
+
                   />
                 )}
                 <button

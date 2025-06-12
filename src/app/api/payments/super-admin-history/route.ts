@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getUserFromToken } from "@/lib/getUserFromToken";
 import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
 export async function GET() {
   try {
@@ -8,7 +9,9 @@ export async function GET() {
     
     // ✅ Ensure user is a distributor
     if (!user || user.role !== "SUPERADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+                return redirect("/signin");
+
+     // return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     // ✅ Fetch Payments

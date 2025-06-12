@@ -41,27 +41,35 @@ export default function EditDistributorPage() {
   const router = useRouter();
   const { id } = useParams(); // ✅ Get distributor ID from URL
 
-  useEffect(() => {
-    const fetchDistributor = async () => {
-      if (!id) return;
-      console.log('id',id);
-      const res = await fetch(`/api/distributor/${id}`);
-      const data = await res.json();
-      console.log("Fetched Distributor Data:", data); // ✅ Debugging API response
-      setDistributor(data);
-      setSelectedPlan(plans.find((p) => p.id === data.planId) || null);
-    };
+useEffect(() => {
+  const fetchData = async () => {
+    if (!id) return;
 
-    const fetchPlans = async () => {
-      const res = await fetch("/api/plans");
-      const data = await res.json();
-      setPlans(data);
-    };
+    // Fetch plans first
+    const planRes = await fetch("/api/plans");
+    const planData = await planRes.json();
+    console.log("Fetched Plans:", planData);
 
-    fetchDistributor();
-    fetchPlans();
-  }, [id]);
+    setPlans(planData);
 
+    // Now fetch distributor
+    const distRes = await fetch(`/api/distributor/${id}`);
+    const distData = await distRes.json();
+
+    const planId = String(distData.plan ?? ""); // Support both keys
+    setDistributor({
+      ...distData,
+      planId,
+    });
+
+    const selected = planData.find((p: Plan) => p.id === planId);
+    setSelectedPlan(selected || null);
+    console.log("Fetched Distributor:", distData);
+
+  };
+  fetchData();
+}, [id]);
+   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setDistributor((prev) => prev ? { ...prev, [name]: value } : prev);
@@ -125,7 +133,7 @@ export default function EditDistributorPage() {
           >
             <option value="">-- Select a plan --</option>
             {plans.map((plan) => (
-              <option key={plan.id} value={plan.id}>
+              <option key={plan.id} value={distributor.planId}>
                 {plan.name}
               </option>
             ))}

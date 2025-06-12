@@ -2,12 +2,15 @@
 import { NextResponse } from "next/server";
 import { getUserFromToken } from "@/lib/getUserFromToken";
 import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
 export async function GET() {
   try {
     const user = await getUserFromToken();
     if (!user || user.role !== "DISTRIBUTOR") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+          return redirect("/signin");
+
+      //return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     const history = await prisma.payment.findMany({

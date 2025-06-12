@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserFromToken } from "@/lib/getUserFromToken";
 import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
 export async function POST(req: NextRequest) {
   const user = await getUserFromToken();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return redirect("/signin");
 
   const { name, email } = await req.json();
 

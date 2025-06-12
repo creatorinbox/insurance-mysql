@@ -57,8 +57,12 @@ const dealerId = params.id ;
     const res = await fetch(`/api/dealer/${dealerId}`);
     const data = await res.json();
     console.log("Fetched Dealer Data:", data); // ✅ Debugging API response
-    setDealer(data);
-    setSelectedPlanId(data.planId);
+    //setDealer(data);
+   // setSelectedPlanId(data.planId);
+   setDealer({ ...data, planId: data.plan?.toString() });
+
+   setSelectedPlanId(data.plan?.toString() || "");
+
   };
 
   const fetchPlans = async () => {
@@ -120,7 +124,11 @@ const dealerId = params.id ;
 
           <div>
             <Label>Policy Booking Date</Label>
-            <Input name="policyBookingDate" type="date" defaultValue={dealer.policyBookingDate} />
+          <Input
+  name="policyBookingDate"
+  type="date"
+  defaultValue={dealer.policyBookingDate.split("T")[0]}
+/>
           </div>
 
           <div>
@@ -163,14 +171,14 @@ const dealerId = params.id ;
           </div>
 
           {/* Plan details section */}
-    {selectedPlanId && plans.length > 0 && (
+ {selectedPlanId && plans.length > 0 && (
   <div className="border rounded p-4 bg-gray-50 mt-4">
-    <p><strong>Plan Name:</strong> {plans.find((plan) => plan.id === selectedPlanId)?.name || "Unknown"}</p>
-    <p><strong>Role:</strong> {plans.find((plan) => plan.id === selectedPlanId)?.role || "N/A"}</p>
+    <p><strong>Plan Name:</strong> {plans.find((plan) => String(plan.id) === String(selectedPlanId))?.name || "Unknown"}</p>
+    <p><strong>Role:</strong> {plans.find((plan) => String(plan.id) === String(selectedPlanId))?.role || "N/A"}</p>
     <div className="mt-2">
       <p className="font-semibold mb-1">Tiers:</p>
       <ul className="list-disc pl-5">
-        {plans.find((plan) => plan.id === selectedPlanId)?.tiers.map((tier) => (
+        {plans.find((plan) => String(plan.id) === String(selectedPlanId))?.tiers?.map((tier) => (
           <li key={tier.id}>
             Discount: {tier.discountPercent}% | Insurance Count: {tier.insuranceCount}
           </li>

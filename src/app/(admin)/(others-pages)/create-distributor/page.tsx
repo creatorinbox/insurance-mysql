@@ -3,13 +3,13 @@ import { useState, useEffect } from "react";
 import Label from "@/components/form/Label";
 
 type PlanTier = {
-  id: string;
+  id: number;
   discountPercent: number;
   insuranceCount: number;
 };
 
 type Plan = {
-  id: string;
+  id: number;
   name: string;
   role: string;
   tiers: PlanTier[];
@@ -51,7 +51,7 @@ export default function CreateDistributorPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (name === "planId") {
-      const plan = plans.find((p) => p.id === value);
+      const plan = plans.find((p) => p.id === parseInt(value,10));
       setSelectedPlan(plan || null);
     }
   };

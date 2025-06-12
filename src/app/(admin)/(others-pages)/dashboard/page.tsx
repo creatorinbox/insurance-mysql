@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const user = await getExtendedUserFromToken();
-  if (!user) redirect("/login");
+  if (!user) redirect("/signin");
   if (user.expired) redirect("/reset-password");
 
   const { id: userId, role } = user;
@@ -21,8 +21,22 @@ export default async function DashboardPage() {
   let paidAmount = 0;
   let effectiveDeduction = 0;
   let eligibleForPayment = false;
+const checkAndUpdateExpiredPolicies = async () => {
+  try {
+    const res = await fetch("/api/insurance/check-expired-insurances", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
 
+    if (!res.ok) {
+      console.error("Failed to update expired policies.");
+    }
+  } catch (error) {
+    console.error("Error checking expired policies:", error);
+  }
+};
   if (role === "DEALER") {
+     checkAndUpdateExpiredPolicies();
     const dealer = await prisma.dealer.findUnique({ where: { id: parseInt(userId,10) } });
 
     if (dealer) {
@@ -31,11 +45,11 @@ export default async function DashboardPage() {
           userId: dealer.id,
           policyBookingDate: { gte: startDate, lte: lastDay },
         },
-        select: { invoiceAmount: true,dueamount:true },
+        select: { invoiceAmount: true,dueamount:true,SalesAmount:true },
       });
 
       for (const ins of insurances) {
-        invoiceTotal += ins.invoiceAmount ?? 0;
+        invoiceTotal += ins.SalesAmount ?? 0;
         dueTotal += ins.dueamount ?? 0;
       }
 
@@ -63,11 +77,12 @@ export default async function DashboardPage() {
         userId: { in: dealerIds },
         policyBookingDate: { gte: startDate, lte: lastDay },
       },
-      select: { invoiceAmount: true },
+      select: { invoiceAmount: true ,dueamount:true,SalesAmount:true},
     });
 
     for (const ins of insurances) {
-      invoiceTotal += ins.invoiceAmount ?? 0;
+      invoiceTotal += ins.SalesAmount ?? 0;
+      dueTotal+= ins.dueamount ?? 0;
     }
 
     const payments = await prisma.payment.findMany({
@@ -81,7 +96,7 @@ export default async function DashboardPage() {
       paidAmount += p.baseAmount;
     }
 
-    dueTotal = invoiceTotal - paidAmount;
+   paidAmount =  paidAmount;
     const insuranceCount = insurances.length;
 
     if (dueTotal > 0) {
@@ -122,7 +137,7 @@ export default async function DashboardPage() {
         const diff = discValue - adjusted;
         finalDue = dueTotal - diff;
       } else {
-        finalDue = dueTotal - (dueTotal * baseRate) / 100;
+        finalDue = dueTotal - (dueTotal * baseRate / 100);
       }
     }
   }
@@ -139,20 +154,21 @@ if (role === "SUPERADMIN") {
     if (payments.length > 0) {
       for (const p of payments) paidAmount += p.baseAmount;
     }
-
+paidAmount=paidAmount;
     const insurances = await prisma.insurance.findMany({
       where: {
         userId: { in: dealerIds },
         policyBookingDate: { gte: startDate, lte: lastDay },
       },
-      select: { invoiceAmount: true },
+      select: { invoiceAmount: true ,dueamount:true,SalesAmount:true},
     });
 
     for (const i of insurances) {
-      invoiceTotal += i.invoiceAmount ?? 0;
+      invoiceTotal += i.SalesAmount ?? 0;
+      dueTotal+= i.dueamount ?? 0;
     }
 
-    dueTotal = invoiceTotal - paidAmount;
+   // dueTotal = invoiceTotal - paidAmount;
   }
 }
   return (

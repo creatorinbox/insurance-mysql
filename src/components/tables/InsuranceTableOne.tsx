@@ -64,7 +64,27 @@ export default function InsuranceTable() {
 
     fetchData();
   }, []);
+const handleUpdateStatus = async (policyId: string, newStatus: string) => {
+  try {
+    const res = await fetch(`/api/insurance/update`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ policyId, status: newStatus }),
+    });
 
+    if (res.ok) {
+      setData((prevData) =>
+        prevData.map((policy) =>
+          policy.id === policyId ? { ...policy, policyStatus: newStatus } : policy
+        )
+      );
+    } else {
+      alert("Failed to update policy status.");
+    }
+  } catch (error) {
+    console.error("Error updating policy status:", error);
+  }
+};
   if (loading) return <p className="p-4">Loading insurance policies...</p>;
   if (data.length === 0) return <p className="p-4">No insurance policies found.</p>;
 
@@ -80,10 +100,7 @@ export default function InsuranceTable() {
                 <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Policy Type</TableCell>
                 <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Product</TableCell>
                 <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Kit No</TableCell>
-                <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Tier</TableCell>
-                <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Sales Amount</TableCell>
-                <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Due Amount</TableCell>
-                <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Start</TableCell>
+                <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Invoice Amount</TableCell>
                 <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Expiry</TableCell>
                 <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Policy Price</TableCell>
                 <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Status</TableCell>
@@ -95,33 +112,62 @@ export default function InsuranceTable() {
                 <TableRow key={item.id}>
                   <TableCell className="px-5 py-4 text-start">{item.customerName}</TableCell>
                   <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">{item.mobilenumber}</TableCell>
-                  <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">{item.policyType}</TableCell>
+               <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">
+  {(() => {
+    switch (item.policyType) {
+      case "adld":
+        return "QYK Max";
+      case "combo1Year":
+        return "QYK Shield";
+      case "ew1Year":
+        return "QYK Pro 1 Year";
+      case "ew2Year":
+        return "QYK Pro 2 Year";
+      case "ew3Year":
+        return "QYK Pro 3 Year";
+      default:
+        return item.policyType;
+    }
+  })()}
+</TableCell>
                   <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">{item.productName}</TableCell>
                   <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">{item.kitNumber}</TableCell>
-                  <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">{item.tier}</TableCell>
                   <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">{item.invoiceAmount}</TableCell>
-                  <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">{item.dueamount}</TableCell>
 
-                  <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">
-                    {new Date(item.policyStartDate).toLocaleDateString()}
-                  </TableCell>
                   <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">
                     {new Date(item.expiryDate).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-start text-gray-500 text-theme-sm dark:text-gray-400">{item.policyPrice?.price}</TableCell>
+
                   <TableCell className="px-4 py-3 text-start">
                     <Badge
                       size="sm"
                       color={
-                        item.paidstatus === "PAID"
+                        item.policyStatus === "Active"
                           ? "success"
-                          : item.paidstatus === "pending"
+                          : item.policyStatus === "Under Booking"
                           ? "warning"
                           : "error"
                       }
                     >
-                      {item.paidstatus}
+                      {item.policyStatus}
                     </Badge>
+                     {item.policyStatus === "Under Booking" && (
+    <div className="mt-2 flex gap-2">
+      <button
+        onClick={() => handleUpdateStatus(item.id, "Cancelled")}
+        className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700"
+      >
+        Cancel
+      </button>
+      <button
+        onClick={() => handleUpdateStatus(item.id, "Reissued")}
+        className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
+      >
+        Reissue
+      </button>
+    </div>
+  )}
                   </TableCell>
                 </TableRow>
               ))}

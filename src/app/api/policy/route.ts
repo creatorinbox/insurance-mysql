@@ -5,6 +5,7 @@ import {  NextResponse } from "next/server";
 //import { ObjectId } from "mongodb";
 //import jwt from "jsonwebtoken";
 import { getUserFromToken } from "@/lib/getUserFromToken";
+import { redirect } from "next/navigation";
 
 // export async function POST(req: NextRequest) {
 //   try {
@@ -126,7 +127,8 @@ export async function GET() {
      const user = await getUserFromToken();
     
         if (!user) {
-          return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+          return redirect("/signin");
+         // return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
     const policies = await prisma.policyPricing.findMany({
       orderBy: {

@@ -28,12 +28,23 @@ export const POST = async (req: NextRequest) => {
   }
 
   const price = plan[yearKey];
-
+ let ewyears;
+if (yearKey === "adld") {
+  ewyears = "QYK Max";
+} else if (yearKey === "combo1Year") {
+  ewyears = "QYK Shield";
+} else if (yearKey === "ew1Year") {
+  ewyears = "QYK Pro 1 Year";
+} else if (yearKey === "ew2Year") {
+  ewyears = "QYK Pro 2 Year";
+} else if (yearKey === "ew3Year") {
+  ewyears = "QYK Pro 3 Year";
+}
   return NextResponse.json({
     valid: true,
     plan: {
       category: plan.category,
-      ewYear: yearKey,
+      ewYear: ewyears,
       price,
     },
   });

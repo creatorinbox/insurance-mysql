@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 //import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
+import { redirect } from "next/navigation";
+
 // Replace this with your real JWT secret
 //const JWT_SECRET = process.env.JWT_SECRET!;
 interface JwtPayload {
@@ -16,7 +18,9 @@ export async function POST(req: NextRequest) {
    const token = req.headers.get("cookie")?.split("token=")[1]?.split(";")[0];
    
      if (!token) {
-       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+             return redirect("/signin");
+      
+      // return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
      }
    
      let user: { id: number; role: string };
@@ -75,7 +79,9 @@ export async function GET(req: Request) {
     ?.trim();
 
   if (!token) {
-    return NextResponse.json({ message: "Unauthorized - Token missing" }, { status: 401 });
+           return redirect("/signin");
+    
+  //  return NextResponse.json({ message: "Unauthorized - Token missing" }, { status: 401 });
   }
 
   let user: { id: number; role: string };

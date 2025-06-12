@@ -122,6 +122,7 @@ export default function SuperadminPaymentsPage() {
   )}
    <button
       className="px-2 py-1 text-xs text-white bg-green-600 rounded"
+        onClick={() => router.push(`/create-distributor/${distributor.distributorId}`)}
     >
       Edit
     </button>

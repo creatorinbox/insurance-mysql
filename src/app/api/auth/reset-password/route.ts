@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 //import bcrypt from "bcryptjs";
+import { redirect } from "next/navigation";
 
 export async function POST(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
   if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+     return redirect("/signin");
+    //return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { password } = await req.json();

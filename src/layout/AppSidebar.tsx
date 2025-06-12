@@ -27,9 +27,17 @@ import {
 //import { CurrencyRupeeIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 //import SidebarWidget from "./SidebarWidget";
 
+interface AppHeaderProps {
+  companyDetails?: {
+    companyName: string;
+    planName: string;
+    logoUrl: string;
+    colorCode: string;
+    kitName: string;
+  };
+}
 
-
-const AppSidebar: React.FC = () => {
+const AppSidebar: React.FC<AppHeaderProps> = ({ companyDetails }) => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
   //const auth = useAuth();
@@ -489,7 +497,7 @@ console.log('data',user)
             <>
               <Image
                 className="dark:hidden"
-                src="/images/logo/logo.svg"
+               src={companyDetails?.logoUrl || "/images/logo/default.png"}
                 alt="Logo"
                 width={150}
                 height={40}

@@ -73,6 +73,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import jwt from "jsonwebtoken";
+import { redirect } from "next/navigation";
 
 export async function GET(req: Request) {
   try {
@@ -80,7 +81,8 @@ export async function GET(req: Request) {
     const token = cookieHeader?.split("token=")[1]?.split(";")[0]?.trim();
 
     if (!token) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return redirect("/signin");
+      //return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const user = jwt.verify(token, process.env.JWT_SECRET!) as {

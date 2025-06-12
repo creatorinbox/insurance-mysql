@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
 interface Customer {
   id: string;
   customerName: string;
@@ -18,6 +20,7 @@ interface Customer {
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
@@ -53,6 +56,8 @@ export default function CustomersPage() {
               <th className="p-2">Post Code</th>
               <th className="p-2">KYC</th>
               <th className="p-2">DOB</th>
+                            <th className="p-2">Action</th>
+
             </tr>
           </thead>
           <tbody>
@@ -69,6 +74,12 @@ export default function CustomersPage() {
                 <td className="p-2">{c.postCode}</td>
                 <td className="p-2">{c.kyc}</td>
                 <td className="p-2">{new Date(c.dateOfBirth).toLocaleDateString()}</td>
+                <td><button
+      className="px-2 py-1 text-xs text-white bg-green-600 rounded"
+      onClick={() => router.push(`/create-customer/${c.id}`)}
+    >
+      Edit
+    </button></td>
               </tr>
             ))}
           </tbody>

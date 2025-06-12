@@ -73,7 +73,7 @@ const fetchCompanyDetails = async () => {
     <div className="min-h-screen xl:flex">
       {/* Sidebar and Backdrop */}
       
-             {isAuthenticated && <AppSidebar />} {/*Load sidebar only if logged in */}
+             {isAuthenticated && <AppSidebar companyDetails={companyDetails || undefined} />} {/*Load sidebar only if logged in */}
           
       <Backdrop />
       {/* Main Content Area */}

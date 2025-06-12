@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import { getUserFromToken } from "@/lib/getUserFromToken";
+import { redirect } from "next/navigation";
 
 const razorpay = new Razorpay({
   key_id: "rzp_test_8RId0V4Xf3nvQM",
@@ -12,7 +13,9 @@ export async function POST(req: NextRequest) {
     const user = await getUserFromToken();
 
     if (!user || user.role !== "DISTRIBUTOR") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+          return redirect("/signin");
+      
+      //return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     const body = await req.json();

@@ -41,7 +41,7 @@ const [planDetails, setPlanDetails] = useState<PlanDetails | null>(null); // to 
 
   const [mobileInput, setMobileInput] = useState("");
   const [customerData, setCustomer] = useState<Customer | null>(null);
-  const [notFound, setNotFound] = useState(false);
+const [notFound, setNotFound] = useState(false);
 // const states = [
 //   { value: "01", label: "Andhra Pradesh" },
 //   { value: "02", label: "Arunachal Pradesh" },
@@ -115,7 +115,7 @@ const [planDetails, setPlanDetails] = useState<PlanDetails | null>(null); // to 
 
     if (data.exists) {
       setCustomer(data.customer);
-      setNotFound(false);
+     setNotFound(false);
     } else {
       setCustomer(null);
       setNotFound(true);
@@ -163,6 +163,11 @@ const [planDetails, setPlanDetails] = useState<PlanDetails | null>(null); // to 
     alert("No matching plan pricing found!");
     return;
   }
+ const membershipFees = (data.plan.price-(data.plan.price * 0.15)).toFixed(2);
+const salesAmount=data.plan.price;
+  // Add Membership Fee to FormData
+  form.append("membershipFees", membershipFees);
+    form.append("salesAmount", salesAmount);
 
   // Show confirmation popup
   setPlanDetails(data.plan); // assume the response has plan detail
@@ -214,7 +219,7 @@ console.log('catval',policies);
                 Search
               </button>
             </div>
-
+ {notFound && ( <div className="space-y-2 border p-4 bg-gray-50 rounded"><p><strong>Not Found</strong></p></div> )}
             {customerData && (
               <div className="space-y-2 border p-4 bg-gray-50 rounded">
                 <p><strong>Name:</strong> {customerData.customerName}</p>
@@ -231,7 +236,7 @@ console.log('catval',policies);
               </div>
             )}
 
-            {notFound && (
+         
               <button
                 type="button"
                 onClick={() => setShowModal(true)}
@@ -239,7 +244,7 @@ console.log('catval',policies);
               >
                 Add Customer
               </button>
-            )}
+       
           </div>
         </ComponentCard>
 
@@ -312,12 +317,12 @@ console.log('catval',policies);
                 <Select
                   name="ewYear"
                  options={[
-                          { value: "adld", label: "ADLD" },
-        { value: "combo1Year", label: "COMBO" },
+                          { value: "adld", label: "QYK Max" },
+        { value: "combo1Year", label: "QYK Shield " },
 
-        { value: "ew1Year", label: "1 Year" },
-        { value: "ew2Year", label: "2 Year" },
-        { value: "ew3Year", label: "3 Year" },
+        { value: "ew1Year", label: "QYK Pro 1 Year" },
+        { value: "ew2Year", label: "QYK Pro 2 Year" },
+        { value: "ew3Year", label: "QYK Pro 3 Year" },
       ]}
                   placeholder="Select Extended Warranty Period"
                   onChange={() => {}}
@@ -410,14 +415,20 @@ console.log('catval',policies);
   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
     <div className="bg-white p-6 rounded shadow-xl w-full max-w-md">
       <h2 className="text-lg font-bold mb-4">Confirm Plan Pricing</h2>
-      <p><strong>Product:</strong> {planDetails.category}</p>
-      <p><strong>Warranty:</strong> {planDetails.ewYear}</p>
-      <p><strong>Expected Price:</strong> ₹{planDetails.price}</p>
-      {/* <p><strong>Invoice Amount:</strong> ₹{formDataToSubmit?.get("invoiceAmount")}</p> */}
-<p>
+      <p><strong>Asset:</strong> {planDetails.category}</p>
+      <p>
         <strong>Invoice Amount:</strong>{" "}
         ₹{String(formDataToSubmit?.get("invoiceAmount") ?? "")}
       </p>
+      <p><strong>Product:</strong> {planDetails.ewYear}</p>
+      <p><strong>Premium Price:</strong> ₹{planDetails.price}</p>
+            <p><strong>Membership Fees(15%):</strong> ₹{(planDetails.price*15/100)}</p>
+
+      {/* <p><strong>Invoice Amount:</strong> ₹{formDataToSubmit?.get("invoiceAmount")}</p> */}
+      {/* Horizontal Line */}
+      <hr className="my-4 border-gray-300" />
+      <p><strong>Due Amount:</strong> ₹{planDetails.price-(planDetails.price*15/100)}</p>
+
       <div className="mt-4 flex justify-end space-x-3">
         <button
           onClick={() => setShowConfirmModal(false)}

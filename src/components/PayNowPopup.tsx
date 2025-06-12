@@ -9,9 +9,12 @@ interface Props {
   payableAmount: number;
   dealerIds: number[]; // ✅ Handle multiple dealers
   bulkPayment?: boolean;
+  dueAmount:number;
+  gst:number;
+  sgst:number;
 }
 
-export default function PayNowPopup({ baseAmount, discount, payableAmount, dealerIds, bulkPayment = false }: Props) {
+export default function PayNowPopup({ baseAmount, discount, payableAmount, dealerIds, dueAmount,gst,sgst, bulkPayment = false }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -28,8 +31,14 @@ export default function PayNowPopup({ baseAmount, discount, payableAmount, deale
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">{bulkPayment ? "Confirm Bulk Payment" : "Confirm Payment"}</h2>
 
-            <p className="mb-2">Due Amount: ₹ {baseAmount.toFixed(2)}</p>
-            <p className="mb-2">Discount: {discount}%</p>
+            <p className="mb-2">Sale Amount: ₹ {baseAmount.toFixed(2)}</p>
+             <p className="mb-2">Due Amount :{dueAmount} </p>
+
+            <p className="mb-2">Discount :{dueAmount*discount/100}</p>
+           <p className="mb-2">GST18%: {(gst+sgst).toFixed(2)}</p>
+
+            {/* <p className="mb-2">SGST18%: {sgst.toFixed(2)}</p> */}
+
             <p className="mb-4 font-semibold">
               Payable Amount: ₹ {payableAmount.toFixed(2)}
             </p>
@@ -45,7 +54,7 @@ export default function PayNowPopup({ baseAmount, discount, payableAmount, deale
                 amount={+payableAmount.toFixed(2)}
                 dealerIds={dealerIds} // ✅ Supports Bulk Payment
                 discount={discount}
-                base={+baseAmount.toFixed(2)}
+                base={+dueAmount.toFixed(2)}
                 bulkPayment={bulkPayment} // Pass flag for bulk payment
                 onClose={() => setOpen(false)}
               />

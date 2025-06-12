@@ -111,6 +111,7 @@ export default function RazorpayButton({ amount, discount, base, dealerIds, bulk
         dealerIds, // ✅ Handle multiple dealers for bulk payment
         amount,
         base,
+        discount,
         paymentMode: mode,
         referenceNumber: refNo,
         remarks,

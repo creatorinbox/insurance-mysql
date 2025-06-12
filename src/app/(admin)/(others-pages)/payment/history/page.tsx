@@ -33,7 +33,7 @@ export default function PaymentHistoryPage() {
             <tr>
               <th className="px-4 py-3 border-b">Payment ID</th>
               <th className="px-4 py-3 border-b">Paid Amount</th>
-              <th className="px-4 py-3 border-b">Base Amount</th>
+              <th className="px-4 py-3 border-b">Due Amount</th>
               {/* <th className="px-4 py-3 border-b">Due Amount</th> */}
               <th className="px-4 py-3 border-b">Discount %</th>
                             <th className="px-4 py-3 border-b">Payment Mode</th>

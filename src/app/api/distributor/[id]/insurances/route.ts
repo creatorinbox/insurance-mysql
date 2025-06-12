@@ -137,6 +137,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { redirect } from "next/navigation";
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -146,7 +147,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const token = cookieHeader?.split("token=")[1]?.split(";")[0]?.trim();
 
     if (!token) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+                   return redirect("/signin");
+      
+      //return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const user = jwt.verify(token, process.env.JWT_SECRET!) as { id: string; role: string };

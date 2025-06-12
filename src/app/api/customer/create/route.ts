@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
+import { redirect } from "next/navigation";
+
 const prisma = new PrismaClient();
 interface JwtPayload {
   id: number;
@@ -12,7 +14,9 @@ export async function POST(req: NextRequest) {
     // Extract token from cookie header manually
     const token = req.headers.get("cookie")?.split("token=")[1]?.split(";")[0];
     if (!token) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+             return redirect("/signin");
+
+     // return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     // Verify JWT

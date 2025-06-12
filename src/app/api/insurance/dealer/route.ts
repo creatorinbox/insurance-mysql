@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import jwt from "jsonwebtoken";
+import { redirect } from "next/navigation";
 
 export async function GET(req: Request) {
   const token = req.headers.get("cookie")?.split("token=")[1]?.split(";")[0];
   if (!token) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    return redirect("/signin");
+   // return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   let payload;
   try {
-    payload = jwt.verify(token, process.env.JWT_SECRET!) as { id: string; role: string };
+    payload = jwt.verify(token, process.env.JWT_SECRET!) as { id: number; role: string };
   } catch  {
     return NextResponse.json({ message: "Invalid token" }, { status: 403 });
   }
@@ -21,7 +23,7 @@ export async function GET(req: Request) {
   }
 
   const insurances = await prisma.insurance.findMany({
-    where: { dealerName: payload.id },
+    where: { userId: payload.id },
     select: {
       id: true,
       productName: true,

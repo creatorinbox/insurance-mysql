@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { redirect } from "next/navigation";
 
 // export async function GET(req: NextRequest) {
 //   try {
@@ -66,7 +67,9 @@ export async function POST(req: NextRequest) {
             const token = cookieHeader?.split("token=")[1]?.split(";")[0]?.trim();
         
             if (!token) {
-              return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+                         return redirect("/signin");
+
+             // return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
             }
         
             const user = jwt.verify(token, process.env.JWT_SECRET!) as { id: number };
@@ -138,7 +141,7 @@ const kitNumber = `${prefix}${stateCode}${currentMonth}${yearCode}${generateSeri
         policyNumber: form.get("policyId")?.toString() || "",
         policyStartDate: policyStartDate,
         expiryDate: expiryDate,
-        policyStatus: form.get("status")?.toString() || "",
+        policyStatus: "Under Booking",
         make: form.get("make")?.toString() || "",
         modelNo: form.get("modelNo")?.toString() || "",
         invoiceDate: getSafeDate(form.get("invoiceDate")),
@@ -154,12 +157,13 @@ const kitNumber = `${prefix}${stateCode}${currentMonth}${yearCode}${generateSeri
         businessPartnerCategory: form.get("businessPartnerCategory")?.toString() || "",
         lanNumber: form.get("lanNumber")?.toString() || "",
         policyBookingDate: getSafeDate(form.get("policyBookingDate")),
-        membershipFees: form.get("membershipFees")?.toString() || "4000",
+        membershipFees: parseFloat(form.get("membershipFees")?.toString() || "0"),
+        SalesAmount: parseFloat(form.get("salesAmount")?.toString() || "0"),
         brokerDetails: form.get("brokerDetails")?.toString() || "",
         locationCode: form.get("locationCode")?.toString() || "",
         loanApiIntegration: form.get("loanApiIntegration")?.toString() || "",
         userId: user.id,
-        dueamount:parseFloat(form.get("invoiceAmount")?.toString() || "0"),
+        dueamount:parseFloat(form.get("membershipFees")?.toString() || "0"),
         paidstatus:"pending",
         updatedAt:new Date(),
       },
@@ -239,7 +243,9 @@ export async function GET(req: NextRequest) {
     const token = cookieHeader?.split("token=")[1]?.split(";")[0]?.trim();
 
     if (!token) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+                 return redirect("/signin");
+
+    //  return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const user = jwt.verify(token, process.env.JWT_SECRET!) as { id: number };

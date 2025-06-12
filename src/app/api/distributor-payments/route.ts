@@ -259,6 +259,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import jwt from "jsonwebtoken";
+import { redirect } from "next/navigation";
 
 export async function GET(req: Request) {
   try {
@@ -266,7 +267,9 @@ export async function GET(req: Request) {
     const token = cookieHeader?.split("token=")[1]?.split(";")[0]?.trim();
 
     if (!token) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+                         return redirect("/signin");
+      
+      //return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const user = jwt.verify(token, process.env.JWT_SECRET!) as {
@@ -306,18 +309,24 @@ console.log('monthend',isMonthEnd);
         userId: { in: dealerIds },
         policyBookingDate: { gte: startDate, lte: endDate },
       },
-      select: { userId: true, invoiceAmount: true },
+      select: { userId: true, invoiceAmount: true , dueamount:true,SalesAmount:true},
     });
 
     // Group insurance totals
     const insuranceTotals: Record<string, number> = {};
+        const dueTotals: Record<string, number> = {};
+
     const insuranceCounts: Record<string, number> = {};
     for (const i of insurances) {
       const id = i.userId;
      // const amt = parseFloat(i.invoiceAmount || "0");
-       const amt = typeof i.invoiceAmount === "string" ? parseFloat(i.invoiceAmount) : i.invoiceAmount || 0;
+       const amt = typeof i.SalesAmount === "string" ? parseFloat(i.SalesAmount) : i.SalesAmount || 0;
+      const dueamt = typeof i.dueamount === "string" ? parseFloat(i.dueamount) : i.dueamount || 0;
+
 
       insuranceTotals[id] = (insuranceTotals[id] || 0) + amt;
+       dueTotals[id] = (dueTotals[id] || 0) + dueamt;
+
       insuranceCounts[id] = (insuranceCounts[id] || 0) + 1;
     }
 
@@ -396,13 +405,14 @@ const summary = await Promise.all(
     const salesAmount = insuranceTotals[id] || 0;
     const insuranceCount = insuranceCounts[id] || 0;
     const paidAmount = paymentTotals[id] || 0;
-    const dueAmount = salesAmount - paidAmount;
+    const dueAmount = dueTotals[id] || 0;
 
     let distributorDiscount = 0;
     let dealerDiscount = 0;
     let finalDue = dueAmount;
     let effectiveDeduction = 15;
-
+let gst=0;
+let sgst=0;
     // 👉 Apply distributor tier discount if eligible
     if (tiers.length && isMonthEnd && dueAmount > 0) {
       const matchingTier = tiers.find((tier) => tier.insuranceCount <= insuranceCount);
@@ -442,8 +452,13 @@ const summary = await Promise.all(
         const finalDiscount = discVal - commission;
         finalDue = dueAmount - finalDiscount;
       } else {
-        finalDue = dueAmount - (dueAmount * 15) / 100;
+        finalDue = dueAmount - (dueAmount * 15 / 100);
       }
+       gst = (finalDue * 9) / 100;
+   sgst = (finalDue * 9) / 100;
+
+    // ✅ Update final due amount including taxes
+    finalDue = finalDue + gst + sgst;
     }
 
     return {
@@ -459,6 +474,8 @@ const summary = await Promise.all(
       finalDue,
       distributorDiscount,
       dealerDiscount,
+      gst,
+      sgst,
     };
   })
 );

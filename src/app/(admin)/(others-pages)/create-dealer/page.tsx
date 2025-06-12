@@ -9,13 +9,13 @@ import { ChevronDownIcon } from "@/icons";
 import Select from "@/components/form/Select";
 
 type PlanTier = {
-  id: string;
+  id: number;
   discountPercent: number;
   insuranceCount: number;
 };
 
 type Plan = {
-  id: string;
+  id: number;
   name: string;
   role: string;
   tiers: PlanTier[];
@@ -72,7 +72,7 @@ const states = [
     fetchPlans();
   }, []);
 
-  const selectedPlan = plans.find((plan) => plan.id === selectedPlanId);
+  const selectedPlan = plans.find((plan) => plan.id === parseInt(selectedPlanId,10));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

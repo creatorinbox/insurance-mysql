@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { redirect } from "next/navigation";
+
 //import jwt from "jsonwebtoken";
 
 // interface JwtPayload {
@@ -35,7 +37,9 @@ export async function PUT(req: NextRequest) {
     const token = req.headers.get("cookie")?.split("token=")[1]?.split(";")[0];
 
     if (!token) {
-      return NextResponse.json({ error: "Unauthorized - Token missing" }, { status: 401 });
+                   return redirect("/signin");
+
+     // return NextResponse.json({ error: "Unauthorized - Token missing" }, { status: 401 });
     }
 
     

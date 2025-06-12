@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromToken } from "@/lib/getUserFromToken";
+import { redirect } from "next/navigation";
+
 type AllowedRole = "DISTRIBUTOR" | "DEALER";
 export async function GET() {
   const user = await getUserFromToken();
 
     if (!user ) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+                return redirect("/signin");
+      
+     // return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
     let selectrole: AllowedRole | undefined;
     if(user.role=='SUPERADMIN')
