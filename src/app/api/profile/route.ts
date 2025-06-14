@@ -3,7 +3,9 @@ import { NextResponse } from "next/server";
 import { getUserFromToken } from "@/lib/getUserFromToken";
 import { redirect } from "next/navigation";
 
-export async function POST(req: Request) {
+
+
+export async function GET(req: Request) {
   try {
     const cookieHeader = req.headers.get("cookie");
     const token = cookieHeader?.split("token=")[1]?.split(";")[0]?.trim();
@@ -16,26 +18,24 @@ export async function POST(req: Request) {
     const user = await getUserFromToken();
     if (!user) return redirect("/signin");
  const userId = parseInt(user.id, 10);
-
-    const body = await req.json();
-    if (!body || Object.keys(body).length === 0) {
-      return NextResponse.json({ error: "Invalid request: No data provided" }, { status: 400 });
-    }
-
-    let updatedProfile;
+    let profile;
     if (user.role === "SUPERADMIN") {
-      updatedProfile = await prisma.superadmin.update({ where: { id: userId }, data: body });
+      profile = await prisma.superadmin.findUnique({ where: { id: userId } });
     } else if (user.role === "DEALER") {
-      updatedProfile = await prisma.dealer.update({ where: { id: userId }, data: body });
+      profile = await prisma.dealer.findUnique({ where: { id: userId } });
     } else if (user.role === "DISTRIBUTOR") {
-      updatedProfile = await prisma.distributor.update({ where: { id: userId }, data: body });
+      profile = await prisma.distributor.findUnique({ where: { id: userId} });
     } else {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
-    return NextResponse.json(updatedProfile);
+    if (!profile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ ...profile, role: user.role }); // ✅ Ensures role exists
   } catch (error) {
-    console.error("Error updating profile:", error);
+    console.error("Error fetching profile:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

@@ -253,19 +253,24 @@ export default function UserDropdown() {
           <span className="text-sm text-gray-500">{user.email}</span>
           <span className="block mt-1 text-xs text-gray-400 uppercase">{user.role}</span>
         </div>
-
-        <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200">
-          <li>
-            <DropdownItem href="/profile" onItemClick={closeDropdown}>
-              Edit Profile
-            </DropdownItem>
-          </li>
-          <li>
-            <DropdownItem href="/reset-password" onItemClick={closeDropdown}>
-              Change Password
-            </DropdownItem>
-          </li>
-        </ul>
+<ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200">
+  <li>
+    <DropdownItem onItemClick={() => { 
+      closeDropdown(); 
+      router.push("/profile"); 
+    }}>
+      Edit Profile
+    </DropdownItem>
+  </li>
+  <li>
+    <DropdownItem onItemClick={() => { 
+      closeDropdown(); 
+      router.push("/reset-password"); 
+    }}>
+      Change Password
+    </DropdownItem>
+  </li>
+</ul>
 
         <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-red-600 hover:bg-gray-100">
           Logout

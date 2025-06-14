@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
+import { Dropdown } from "@/components/ui/dropdown/Dropdown";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 interface SuperadminPaymentEntry {
   distributorId: string;
   distributorName: string;
@@ -16,7 +18,15 @@ interface SuperadminPaymentEntry {
 export default function SuperadminPaymentsPage() {
   const [distributors, setDistributors] = useState<SuperadminPaymentEntry[]>([]);
   const router = useRouter();
+const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
+const toggleDropdown = (distributorId: string) => {
+  setOpenDropdownId(openDropdownId === distributorId ? null : distributorId);
+};
+
+const closeDropdown = () => {
+  setOpenDropdownId(null);
+};
   useEffect(() => {
     fetch("/api/superadmin-payments", { credentials: "include" })
       .then((res) => res.json())
@@ -82,7 +92,49 @@ export default function SuperadminPaymentsPage() {
                 </button>
               </td>
               <td className="p-2">{distributor.status}</td> 
-              <td className="p-2 space-x-2">
+             <td className="p-2 relative">
+  {/* Three-dot menu button */}
+  <button
+    onClick={() => toggleDropdown(distributor.distributorId)}
+    className="text-gray-600 hover:text-gray-900 px-2 py-1"
+  >
+    <i className="fas fa-ellipsis-v"></i> {/* FontAwesome three-dot icon */}
+  </button>
+
+  {/* Dropdown menu (conditionally displayed when distributor's dropdown is open) */}
+  {openDropdownId === distributor.distributorId && (
+    <Dropdown isOpen={true} onClose={closeDropdown} className="absolute right-0 mt-2 w-40 bg-white shadow-md rounded-md p-2">
+      {distributor.status === "ACTIVE" && (
+        <>
+          <DropdownItem onItemClick={() => handleAction(distributor.distributorId, "block")}>
+            Block Distributor
+          </DropdownItem>
+          <DropdownItem onItemClick={() => handleAction(distributor.distributorId, "terminate")}>
+            Terminate Distributor
+          </DropdownItem>
+        </>
+      )}
+      
+      {distributor.status === "BLOCKED" && (
+        <DropdownItem onItemClick={() => handleAction(distributor.distributorId, "active")}>
+          Activate Distributor
+        </DropdownItem>
+      )}
+
+      {distributor.status === "pending" && (
+        <DropdownItem onItemClick={() => handleAction(distributor.distributorId, "active")}>
+          Approve Distributor
+        </DropdownItem>
+      )}
+
+      <DropdownItem onItemClick={() => router.push(`/create-distributor/${distributor.distributorId}`)}>
+        Edit Distributor
+      </DropdownItem>
+    </Dropdown>
+  )}
+</td>
+
+              {/* <td className="p-2 space-x-2">
   {distributor.status === "ACTIVE" && (
     <>
       <button
@@ -126,7 +178,7 @@ export default function SuperadminPaymentsPage() {
     >
       Edit
     </button>
-</td>
+</td> */}
             </tr>
           ))}
         </tbody>

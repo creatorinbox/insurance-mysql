@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PayNowPopup from "@/components/PayNowPopup";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
+import { Dropdown } from "@/components/ui/dropdown/Dropdown";
 interface DistributorPayment {
   id: number;
   dealerName: string;
@@ -32,7 +34,15 @@ export default function DistributorPaymentsPage() {
   const [selectedDealers, setSelectedDealers] = useState<number[]>([]);
 const [bulkPaymentData, setBulkPaymentData] = useState<BulkPaymentData | null>(null);
   const router = useRouter();
+const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
 
+function toggleDropdown(dealerId: number) {
+  setOpenDropdownId(openDropdownId === dealerId ? null : dealerId);
+}
+
+function closeDropdown() {
+  setOpenDropdownId(null);
+}
   useEffect(() => {
     fetch("/api/distributor-payments", { credentials: "include" })
       .then((res) => res.json())
@@ -217,7 +227,7 @@ const handleAction = async (id: number, action: "block" | "terminate"| "active")
   {dealer.status === "BLOCKED" && <i className="fas fa-ban text-red-500"></i>}
   {dealer.status === "TERMINATED" && <i className="fas fa-times-circle text-gray-500"></i>}
 </td>
-              <td className="p-2 space-x-2">
+              {/* <td className="p-2 space-x-2">
                 {dealer.status === "ACTIVE" && (
                   <>
                     <button
@@ -276,7 +286,52 @@ const handleAction = async (id: number, action: "block" | "terminate"| "active")
     >
       Edit
     </button>
-              </td>
+              </td> */}
+              <td className="p-2 relative">
+  {/* Three-dot menu button */}
+  <button onClick={() => toggleDropdown(dealer.id)} className="text-gray-600 hover:text-gray-900 px-2 py-1">
+    <i className="fas fa-ellipsis-v"></i> {/* Three-dot menu icon */}
+  </button>
+
+  {/* Dropdown menu (conditionally displayed when dealer's dropdown is open) */}
+  {openDropdownId === dealer.id && (
+    <Dropdown isOpen={true} onClose={closeDropdown} className="absolute right-0 mt-2 w-40 bg-white shadow-md rounded-md p-2">
+      {dealer.status === "ACTIVE" && (
+        <>
+          <DropdownItem onItemClick={() => handleAction(dealer.id, "block")}>Block Dealer</DropdownItem>
+          <DropdownItem onItemClick={() => handleAction(dealer.id, "terminate")}>Terminate Dealer</DropdownItem>
+        </>
+      )}
+
+      {dealer.status === "BLOCKED" && (
+        <DropdownItem onItemClick={() => handleAction(dealer.id, "active")}>Activate Dealer</DropdownItem>
+      )}
+
+      {dealer.status === "pending" && (
+        <DropdownItem onItemClick={() => handleAction(dealer.id, "active")}>Approve Dealer</DropdownItem>
+      )}
+
+      <DropdownItem onItemClick={() => router.push(`/create-dealer/${dealer.id}`)}>Edit Dealer</DropdownItem>
+
+      {/* ✅ PayNowPopup for handling payments */}
+      {dealer.dueAmount > 0 && (
+        <DropdownItem>
+          <PayNowPopup
+            baseAmount={dealer.salesAmount}
+            dealerIds={[dealer.id]} // ✅ Handle single payments
+            discount={dealer.effectiveDeduction}
+            payableAmount={dealer.finalDue}
+            bulkPayment={false}
+            dueAmount={dealer.dueAmount}
+            gst={dealer.gst}
+            sgst={dealer.sgst}
+          />
+        </DropdownItem>
+      )}
+    </Dropdown>
+  )}
+</td>
+
             </tr>
           ))}
         </tbody>

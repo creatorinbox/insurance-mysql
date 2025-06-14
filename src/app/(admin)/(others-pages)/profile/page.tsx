@@ -1,73 +1,115 @@
-// import UserAddressCard from "@/components/user-profile/UserAddressCard";
-// import UserInfoCard from "@/components/user-profile/UserInfoCard";
-// import UserMetaCard from "@/components/user-profile/UserMetaCard";
-// import { Metadata } from "next";
-// import React from "react";
+"use client";
+import { useEffect, useState } from "react";
 
-// export const metadata: Metadata = {
-//   title: "Next.js Profile | TailAdmin - Next.js Dashboard Template",
-//   description:
-//     "This is Next.js Profile page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
-// };
+type UserRole = "SUPERADMIN" | "DEALER" | "DISTRIBUTOR";
 
-// export default function Profile() {
-//   return (
-//     <div>
-//       <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
-//         <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">
-//           Profile
-//         </h3>
-//         <div className="space-y-6">
-//           <UserMetaCard />
-//           <UserInfoCard />
-//           <UserAddressCard />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-// app/profile/page.tsx
-import { getUserFromToken } from "@/lib/getUserFromToken";
-import { prisma } from "@/lib/prisma";
-import type { dealer, distributor, superadmin } from "@prisma/client";
+interface UserProfile {
+  role: UserRole;
+  name?: string;
+  email?: string;
+  mobile?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  gstNumber?: string;
+  contactPerson?: string;
+  dealerName?: string;
+  dealerLocation?: string;
+  businessPartnerName?: string;
+  status?: string;
+  region?: string;
+}
 
-export default async function ProfilePage() {
-  const user = await getUserFromToken();
-  if (!user) {
-    return <div className="p-6 text-red-600">Unauthorized</div>;
+const editableFields: Record<UserRole, string[]> = {
+  SUPERADMIN: ["name", "email", "mobile", "address", "city", "state", "gstNumber", "contactPerson"],
+  DEALER: ["dealerName", "email", "mobile", "dealerLocation", "businessPartnerName", "status"],
+  DISTRIBUTOR: ["name", "email", "mobile", "city", "state", "region", "contactPerson"]
+};
+
+export default function EditProfilePage() {
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [formData, setFormData] = useState<Partial<UserProfile>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const res = await fetch("/api/profile");
+        const data = await res.json();
+        console.log("Fetched Profile:", data); // ✅ Debugging line
+
+        if (!data.error) {
+          setProfile(data as UserProfile);
+          setFormData(data);
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProfile();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  console.log("Sending Form Data:", formData); // ✅ Debugging step
+
+  if (Object.keys(formData).length === 0) {
+    alert("No fields to update.");
+    return;
   }
 
-let userData: dealer | distributor | superadmin | null = null;  if (user.role === "DEALER") {
-    userData = await prisma.dealer.findUnique({ where: { id: parseInt(user.id,10) } });
-  } else if (user.role === "DISTRIBUTOR") {
-    userData = await prisma.distributor.findUnique({ where: { id: parseInt(user.id,10)} });
-  } else if (user.role === "SUPERADMIN") {
-    userData = await prisma.superadmin.findUnique({ where: { id: parseInt(user.id,10) } });
+  const updateData = { ...formData };
+  delete updateData.role; // ✅ Remove 'role' instead of destructuring
+
+  const res = await fetch(`/api/profile/update`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updateData), // ✅ Send only valid fields
+  });
+
+  const responseData = await res.json();
+  console.log("Response:", responseData); // ✅ Debugging step
+
+  if (res.ok) {
+    alert("Profile updated successfully!");
+  } else {
+    alert(`Failed to update profile: ${responseData.error}`);
   }
+};
+
+  if (loading) return <p>Loading...</p>;
+  if (!profile || !profile.role) return <p>Profile not found.</p>;
 
   return (
- <div className="p-6">
-  <h1 className="text-xl font-bold mb-4">My Profile</h1>
-  <div className="space-y-2">
-    <p>
-      <strong>Name:</strong>{" "}
-      {user.role === "DEALER" && userData && "dealerName" in userData
-        ? userData.dealerName
-        : user.role === "DISTRIBUTOR" && userData && "name" in userData
-        ? userData.name
-        : user.role === "SUPERADMIN" && userData && "name" in userData
-        ? userData.name
-        : "Unknown"}
-    </p>
-    <p><strong>Email:</strong> {userData?.email}</p>
-    <p><strong>Role:</strong> {user.role}</p>
-  </div>
-
-  <div className="mt-6 space-x-4">
-    <a href="/profile/edit" className="text-blue-600 underline">Edit Profile</a>
-    <a href="/profile/change-password" className="text-blue-600 underline">Change Password</a>
-  </div>
-</div>
-
+    <div className="max-w-xl mx-auto p-6">
+      <h1 className="text-2xl font-semibold mb-4">Edit Profile</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+     {Object.entries(formData)
+  .filter(([key]) => profile.role && editableFields[profile.role]?.includes(key) && key !== "role") // ✅ Exclude role
+  .map(([key, value]) => (
+    <div key={key}>
+      <label className="block mb-1 capitalize">{key.replace(/([A-Z])/g, " $1")}</label>
+      <input
+        type="text"
+        name={key}
+        value={value ?? ""}
+        onChange={handleChange}
+        className="w-full p-2 border rounded"
+      />
+    </div>
+  ))}
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Update Profile
+        </button>
+      </form>
+    </div>
   );
 }
