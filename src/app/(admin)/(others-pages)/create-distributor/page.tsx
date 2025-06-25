@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Label from "@/components/form/Label";
+import Input from "@/components/form/input/InputField";
 
 type PlanTier = {
   id: number;
@@ -18,21 +19,24 @@ type Plan = {
 export default function CreateDistributorPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+const [location, setLocation] = useState({ city: "", state: "" });
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
+      confirmPassword: "", // ✅ Add this
     mobile: "",
     address: "",
-    city: "",
-    state: "",
-    pinCode: "",
+   // city: "",
+    //state: "",
     gstNumber: "",
     contactPerson: "",
     contactMobile: "",
     region: "",
     planId: "",
+        pinCode: "",
+
   });
 
   useEffect(() => {
@@ -42,9 +46,11 @@ export default function CreateDistributorPage() {
       setPlans(data);
     };
     fetchPlans();
-  }, []);
+     console.log("📍 City:", location.city);
+  console.log("📍 State:", location.state);
+  }, [location]);
 
-  const handleChange = (
+  const handleChange = async (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
@@ -54,6 +60,25 @@ export default function CreateDistributorPage() {
       const plan = plans.find((p) => p.id === parseInt(value,10));
       setSelectedPlan(plan || null);
     }
+
+  if (name === "pinCode" && value.length === 6) {
+    try {
+      const res = await fetch("/api/pincode-lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pincode: value }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        console.log("locationres",data.city)
+        setLocation({ city: data.city, state: data.state });
+      }
+    } catch (error:unknown) {
+      console.error("Failed to fetch location", error);
+    }
+  }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,6 +97,8 @@ export default function CreateDistributorPage() {
   const payload = {
     ...formData,
     planId: parseInt(formData.planId, 10), // ✅ force planId to integer
+    city: location.city,
+  state: location.state,
   };
     const res = await fetch("/api/distributor", {
       method: "POST",
@@ -87,16 +114,18 @@ export default function CreateDistributorPage() {
         name: "",
         email: "",
         password: "",
+          confirmPassword: "", // ✅ Add this
         mobile: "",
         address: "",
-        city: "",
-        state: "",
-        pinCode: "",
+       // city: "",
+        //state: "",
         gstNumber: "",
         contactPerson: "",
         contactMobile: "",
         region: "",
         planId: "",
+        pinCode: "",
+
       });
       setSelectedPlan(null);
     } else {
@@ -125,6 +154,17 @@ export default function CreateDistributorPage() {
               />
             </div>
         ))}
+
+<div>
+  <Label>City</Label>
+  <Input name="city" type="text" defaultValue={location.city} onChange={handleChange} readOnly />
+</div>
+
+<div>
+  <Label>State</Label>
+  <Input name="state" type="text" defaultValue={location.state} onChange={handleChange} readOnly />
+</div>
+
 
         <div>
           <Label>Select Plan</Label>

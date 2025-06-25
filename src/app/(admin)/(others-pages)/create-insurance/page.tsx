@@ -26,6 +26,7 @@ interface Customer {
   state: string;
   postCode: string;
   kyc: string;
+  kycNumber:string;
   dateOfBirth: string;
 }
 export default function FormElements() {
@@ -42,6 +43,15 @@ const [planDetails, setPlanDetails] = useState<PlanDetails | null>(null); // to 
   const [mobileInput, setMobileInput] = useState("");
   const [customerData, setCustomer] = useState<Customer | null>(null);
 const [notFound, setNotFound] = useState(false);
+const [selectedMake, setSelectedMake] = useState("");
+const [planCodes, setPlanCodes] = useState<{ id: number; name: string }[]>([])
+// Example make list — replace with your own list or fetch dynamically
+const makeOptions = [
+  { value: "Sony", label: "Sony" },
+  { value: "Samsung", label: "Samsung" },
+  { value: "LG", label: "LG" },
+  { value: "Others", label: "Others" },
+];
 // const states = [
 //   { value: "01", label: "Andhra Pradesh" },
 //   { value: "02", label: "Arunachal Pradesh" },
@@ -99,7 +109,12 @@ const [notFound, setNotFound] = useState(false);
         console.error("Failed to fetch dropdown data", error);
       }
     }
-
+ async function fetchPlanCodes() {
+    const res = await fetch("/api/plan-codes")
+    const data = await res.json()
+    setPlanCodes(data)
+  }
+  fetchPlanCodes()
     fetchOptions();
   }, []);
 
@@ -176,7 +191,9 @@ const salesAmount=data.plan.price;
 };
 const handleFinalSubmit = async () => {
   if (!formDataToSubmit) return;
-
+// const make = selectedMake === "Others"
+//   ? (formDataToSubmit.get("make") as string) // from the text field
+//   : selectedMake; // from the dropdown
   const res = await fetch("/api/insurance", {
     method: "POST",
     body: formDataToSubmit,
@@ -320,9 +337,9 @@ console.log('catval',policies);
                           { value: "adld", label: "QYK Max" },
         { value: "combo1Year", label: "QYK Shield " },
 
-        { value: "ew1Year", label: "QYK Pro 1 Year" },
-        { value: "ew2Year", label: "QYK Pro 2 Year" },
-        { value: "ew3Year", label: "QYK Pro 3 Year" },
+        { value: "ew1Year", label: "QYK Protect 1 Year" },
+        { value: "ew2Year", label: "QYK Protect 2 Year" },
+        { value: "ew3Year", label: "QYK Protect 3 Year" },
       ]}
                   placeholder="Select Extended Warranty Period"
                   onChange={() => {}}
@@ -358,16 +375,55 @@ console.log('catval',policies);
         {/* Invoice & Device Details */}
         <ComponentCard title="">
           <div className="space-y-6">
-            <div>
+            {/* <div>
               <Label>Make</Label>
               <Input name="make" type="text" />
-            </div>
-
+            </div> */}
+            <div>
+  <Label>Plan Code</Label>
+  <div className="relative">
+    <Select
+      name="planCodeId"
+      options={planCodes.map((p) => ({
+        value: p.id.toString(),
+        label: p.name
+      }))}
+      placeholder="Select Plan Code"
+      onChange={() => {}}
+      className="dark:bg-dark-900"
+    />
+    <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+      <ChevronDownIcon />
+    </span>
+  </div>
+</div>
+<div>
+  <Label>Make</Label>
+  {selectedMake === "Others" ? (
+    <Input name="make" placeholder="Enter custom make" />
+  ) : (
+    <div className="relative">
+     <Select
+  name="make"
+  options={makeOptions}
+  onChange={(val: string) => setSelectedMake(val)}
+  placeholder="Select Make"
+  className="dark:bg-dark-900"
+/>
+      <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+        <ChevronDownIcon />
+      </span>
+    </div>
+  )}
+</div>
             <div>
               <Label>Model No</Label>
               <Input name="modelNo" type="text" />
             </div>
-
+<div>
+              <Label>LAN Number</Label>
+              <Input name="lanNumber" type="text" />
+            </div>
             <div>
               <Label>Invoice Date</Label>
               <Input name="invoiceDate" type="date" />

@@ -19,6 +19,8 @@ export default function SuperadminPaymentsPage() {
   const [distributors, setDistributors] = useState<SuperadminPaymentEntry[]>([]);
   const router = useRouter();
 const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+const [blockModalDistributorId, setBlockModalDistributorId] = useState<string | null>(null)
+const [blockNote, setBlockNote] = useState("")
 
 const toggleDropdown = (distributorId: string) => {
   setOpenDropdownId(openDropdownId === distributorId ? null : distributorId);
@@ -32,6 +34,26 @@ const closeDropdown = () => {
       .then((res) => res.json())
       .then((res) => setDistributors(res));
   }, []);
+  const handleBlockWithNote = async (distributorId: string, note: string) => {
+  const res = await fetch(`/api/distributor/${distributorId}/block`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ note })
+  })
+
+  setBlockModalDistributorId(null)
+  setBlockNote("")
+
+  if (res.ok) {
+    alert("Distributor blocked successfully.")
+    const refreshed = await fetch("/api/superadmin-payments", { credentials: "include" })
+    const data = await refreshed.json()
+    setDistributors(data)
+  } else {
+    alert("Failed to block distributor.")
+  }
+}
   const handleAction = async (id: string, action: "block" | "terminate"| "active") => {
     const confirmMsg = `Are you sure you want to ${action} this distributor?`;
     if (!window.confirm(confirmMsg)) return;
@@ -106,9 +128,15 @@ const closeDropdown = () => {
     <Dropdown isOpen={true} onClose={closeDropdown} className="absolute right-0 mt-2 w-40 bg-white shadow-md rounded-md p-2">
       {distributor.status === "ACTIVE" && (
         <>
-          <DropdownItem onItemClick={() => handleAction(distributor.distributorId, "block")}>
+          {/* <DropdownItem onItemClick={() => handleAction(distributor.distributorId, "block")}>
             Block Distributor
-          </DropdownItem>
+          </DropdownItem> */}
+          <DropdownItem onItemClick={() => {
+  setBlockModalDistributorId(distributor.distributorId)
+  setOpenDropdownId(null)
+}}>
+  Block Distributor
+</DropdownItem>
           <DropdownItem onItemClick={() => handleAction(distributor.distributorId, "terminate")}>
             Terminate Distributor
           </DropdownItem>
@@ -183,6 +211,37 @@ const closeDropdown = () => {
           ))}
         </tbody>
       </table>
+      {blockModalDistributorId && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white p-6 rounded-md max-w-sm w-full shadow-lg">
+      <h2 className="text-lg font-semibold mb-3">Add Block Reason</h2>
+      <textarea
+        className="w-full border p-2 mb-4"
+        rows={4}
+        placeholder="Enter reason for blocking distributor"
+        value={blockNote}
+        onChange={(e) => setBlockNote(e.target.value)}
+      />
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => {
+            setBlockModalDistributorId(null)
+            setBlockNote("")
+          }}
+          className="px-4 py-2 bg-gray-300 rounded"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={() => handleBlockWithNote(blockModalDistributorId, blockNote)}
+          className="px-4 py-2 bg-red-600 text-white rounded"
+        >
+          Block
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

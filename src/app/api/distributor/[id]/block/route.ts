@@ -5,11 +5,16 @@ const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const dealerId = params.id;
+ const body = await req.json()
+  const note = body.note || "" // fallback in case no note is sent
 
   try {
     const updatedDealer = await prisma.distributor.update({
       where: { id: parseInt(dealerId,10) },
-      data: { status: "BLOCKED" },
+      data: {
+        status: "BLOCKED",
+        note: note
+      },
     });
 
     return NextResponse.json({ message: "Distributor blocked", dealer: updatedDealer }, { status: 200 });

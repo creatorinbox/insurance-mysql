@@ -87,7 +87,7 @@ console.log('data',user)
     {
       name: "Products",
       icon: <ListIcon />,
-      subItems: [{ name: "Products Listing", path: "/policy-tables", pro: false },
+      subItems: [{ name: "Product Pricing Slabs", path: "/policy-tables", pro: false },
        // { name: "policy Category", path: "/policy-pricing", pro: false },
       ],
     }, {
@@ -181,6 +181,18 @@ console.log('data',user)
       subItems: [{ name: "Set Sales Target", path: "/plans", pro: false }],
      
   
+    },
+   {
+      icon: <GridIcon />,
+      name: "Endorsement",
+      path: "/endorsement-tables",
+      //subItems: [{ name: "Ecommerce", path: "/dashboard", pro: false }],
+    },
+     {
+      icon: <GridIcon />,
+      name: "Warrenty Plan Code",
+      path: "/plan-codes",
+      //subItems: [{ name: "Ecommerce", path: "/dashboard", pro: false }],
     },
     // {
     //   name: "Pages",
@@ -423,7 +435,10 @@ console.log('data',user)
 
         item.name === "Payment History" ||
 
-       item.name === "Sales"
+       item.name === "Sales" ||
+             item.name === "Endorsement" ||
+             item.name === "Warrenty Plan Code"
+
 
       ) {
         return false;
@@ -436,8 +451,9 @@ console.log('data',user)
         item.name === "Insurance" ||
         item.name === "Customer" ||
         item.name === "Allocate Policy" ||
-        item.name === "Sales"
-
+        item.name === "Sales" ||
+      item.name === "Endorsement" ||
+         item.name === "Warrenty Plan Code"
       ) {
         return false;
       }

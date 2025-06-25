@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-
+import { useRouter } from "next/navigation"
 //import Badge from "../ui/badge/Badge";
 //import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -25,6 +25,7 @@ interface Policy {
   invoiceAmount:number
   createdAt: Date;
   updatedAt: Date;
+  brokerDetials?:string;
 }
 interface PolicyTableOneProps {
   userRole: string | null;
@@ -33,6 +34,7 @@ interface PolicyTableOneProps {
 export default function PolicyTableOne({ userRole }: PolicyTableOneProps) {
   const [policies, setPolicies] = useState<Policy[]>([]);
   //const CURRENT_USER_ROLE = "SUPERADMIN";
+const router = useRouter()
 
   useEffect(() => {
     async function fetchPolicies() {
@@ -141,12 +143,17 @@ export default function PolicyTableOne({ userRole }: PolicyTableOneProps) {
                  </> ) : (<>
       <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Max-1Yr</TableCell>
 
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Pro-1Yr</TableCell>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Pro-2Yrs</TableCell>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Pro-3Yrs</TableCell>
+                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Protect-1Yr</TableCell>
+                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Protect-2Yrs</TableCell>
+                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Protect-3Yrs</TableCell>
        <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Shield-1Yr</TableCell>
      </> )}
-                  
+     <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">
+  Broker Details
+</TableCell>    
+            <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">
+  Action
+</TableCell>      
                     {/* <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Created Date</TableCell> */}
                   </TableRow>
                 </TableHeader>
@@ -159,9 +166,19 @@ export default function PolicyTableOne({ userRole }: PolicyTableOneProps) {
                       <TableCell className="px-4 py-3">{policy.ew2Year}</TableCell>
                       <TableCell className="px-4 py-3">{policy.ew3Year}</TableCell>
                       <TableCell className="px-4 py-3">{policy.combo1Year}</TableCell>
+                                            <TableCell className="px-4 py-3">{policy.brokerDetials}</TableCell>
+
                       {/* <TableCell className="px-4 py-3">
                         {new Date(policy.createdAt).toLocaleDateString()}
                       </TableCell> */}
+                      <TableCell className="px-4 py-3">
+  <button
+    onClick={() => router.push(`/policy/edit/${policy.id}`)}
+    className="text-blue-600 hover:underline"
+  >
+    Edit
+  </button>
+</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

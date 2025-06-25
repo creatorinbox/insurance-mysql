@@ -25,44 +25,44 @@ export default function CreateDealerPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [selectedPlanId, setSelectedPlanId] = useState<string>("");
    // const [selectedLocationcode, setSelectedLocationcode] = useState<string>("");
-
-const states = [
-  { value: "01", label: "Andhra Pradesh" },
-  { value: "02", label: "Arunachal Pradesh" },
-  { value: "03", label: "Assam" },
-  { value: "04", label: "Bihar" },
-  { value: "05", label: "Chhattisgarh" },
-  { value: "06", label: "Goa" },
-  { value: "07", label: "Gujarat" },
-  { value: "08", label: "Haryana" },
-  { value: "09", label: "Himachal Pradesh" },
-  { value: "10", label: "Jharkhand" },
-  { value: "11", label: "Karnataka" },
-  { value: "12", label: "Kerala" },
-  { value: "13", label: "Madhya Pradesh" },
-  { value: "14", label: "Maharashtra" },
-  { value: "15", label: "Manipur" },
-  { value: "16", label: "Meghalaya" },
-  { value: "17", label: "Mizoram" },
-  { value: "18", label: "Nagaland" },
-  { value: "19", label: "Odisha" },
-  { value: "20", label: "Punjab" },
-  { value: "21", label: "Rajasthan" },
-  { value: "22", label: "Sikkim" },
-  { value: "23", label: "Tamil Nadu" },
-  { value: "24", label: "Telangana" },
-  { value: "25", label: "Tripura" },
-  { value: "26", label: "Uttar Pradesh" },
-  { value: "27", label: "Uttarakhand" },
-  { value: "28", label: "West Bengal" },
-  { value: "29", label: "Andaman and Nicobar Islands" },
-  { value: "30", label: "Chandigarh" },
-  { value: "31", label: "Dadra and Nagar Haveli" },
-  { value: "32", label: "Daman and Diu" },
-  { value: "33", label: "Delhi" },
-  { value: "34", label: "Lakshadweep" },
-  { value: "35", label: "Puducherry" },
-];
+const [location, setLocation] = useState({ city: "", state: "" });
+// const states = [
+//   { value: "01", label: "Andhra Pradesh" },
+//   { value: "02", label: "Arunachal Pradesh" },
+//   { value: "03", label: "Assam" },
+//   { value: "04", label: "Bihar" },
+//   { value: "05", label: "Chhattisgarh" },
+//   { value: "06", label: "Goa" },
+//   { value: "07", label: "Gujarat" },
+//   { value: "08", label: "Haryana" },
+//   { value: "09", label: "Himachal Pradesh" },
+//   { value: "10", label: "Jharkhand" },
+//   { value: "11", label: "Karnataka" },
+//   { value: "12", label: "Kerala" },
+//   { value: "13", label: "Madhya Pradesh" },
+//   { value: "14", label: "Maharashtra" },
+//   { value: "15", label: "Manipur" },
+//   { value: "16", label: "Meghalaya" },
+//   { value: "17", label: "Mizoram" },
+//   { value: "18", label: "Nagaland" },
+//   { value: "19", label: "Odisha" },
+//   { value: "20", label: "Punjab" },
+//   { value: "21", label: "Rajasthan" },
+//   { value: "22", label: "Sikkim" },
+//   { value: "23", label: "Tamil Nadu" },
+//   { value: "24", label: "Telangana" },
+//   { value: "25", label: "Tripura" },
+//   { value: "26", label: "Uttar Pradesh" },
+//   { value: "27", label: "Uttarakhand" },
+//   { value: "28", label: "West Bengal" },
+//   { value: "29", label: "Andaman and Nicobar Islands" },
+//   { value: "30", label: "Chandigarh" },
+//   { value: "31", label: "Dadra and Nagar Haveli" },
+//   { value: "32", label: "Daman and Diu" },
+//   { value: "33", label: "Delhi" },
+//   { value: "34", label: "Lakshadweep" },
+//   { value: "35", label: "Puducherry" },
+// ];
   useEffect(() => {
     const fetchPlans = async () => {
       const res = await fetch("/api/plans");
@@ -70,9 +70,30 @@ const states = [
       setPlans(data);
     };
     fetchPlans();
-  }, []);
+  }, [location]);
 
   const selectedPlan = plans.find((plan) => plan.id === parseInt(selectedPlanId,10));
+const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = e.target;
+
+  if (name === "pincode" && value.length === 6) {
+    try {
+      const res = await fetch("/api/pincode-lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pincode: value }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setLocation({ city: data.city, state: data.state });
+      }
+    } catch (error:unknown) {
+      console.error("Failed to fetch location", error);
+    }
+  }
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +109,12 @@ const states = [
       );
       return;
     }
+const confirmPassword = form.get("confirmPassword")?.toString() || "";
 
+if (password !== confirmPassword) {
+  alert("Passwords do not match.");
+  return;
+}
     const res = await fetch("/api/dealer", {
       method: "POST",
       body: form,
@@ -107,32 +133,49 @@ const states = [
       <ComponentCard title="Dealer Information">
         <div className="space-y-4">
           {[
-            { name: "salesChannel", label: "Sales Channel / Market" },
-            { name: "dealerName", label: "Dealer Name" },
+           // { name: "salesChannel", label: "Sales Channel / Market" },
+            { name: "dealerName", label: "Shop Name" },
             { name: "email", label: "Email" },
-            { name: "password", label: "Password" },
             { name: "dealerLocation", label: "Dealer Location" },
-            { name: "dealerCode", label: "Dealer Code" },
-            { name: "vas", label: "VAS Yes / No" },
-            { name: "businessPartnerName", label: "Business Partner Name" },
-            { name: "businessPartnerCategory", label: "Business Partner Category" },
-            { name: "lanNumber", label: "LAN Number" },
-            { name: "membershipFees", label: "Membership Fees" },
-            { name: "brokerDetails", label: "Broker Details" },
+            // { name: "dealerCode", label: "Dealer Code" },
+            //{ name: "vas", label: "VAS Yes / No" },
+            { name: "businessPartnerName", label: "Owener Name" },
+            { name: "businessPartnerCategory", label: "Owner number" },
+                        { name: "password", label: "Password" },
+
+            // { name: "lanNumber", label: "LAN Number" },
+            // { name: "membershipFees", label: "Membership Fees" },
+            // { name: "brokerDetails", label: "Broker Details" },
          //   { name: "locationCode", label: "Location Code" },
-            { name: "loanApiIntegration", label: "Loan API Integration" },
+            // { name: "loanApiIntegration", label: "Loan API Integration" },
           ].map((field) => (
             <div key={field.name}>
               <Label>{field.label}</Label>
               <Input name={field.name} type="text" />
             </div>
           ))}
-
-          <div>
+           <div>
+            <div>
+  <Label>Confirm Password</Label>
+  <Input name="confirmPassword" type="password" />
+</div>
+  <Label>VAS</Label>
+  <div className="flex gap-4">
+    <label className="flex items-center gap-2">
+      <input type="radio" name="vas" value="yes" className="accent-blue-600" />
+      Yes
+    </label>
+    <label className="flex items-center gap-2">
+      <input type="radio" name="vas" value="no" className="accent-blue-600" />
+      No
+    </label>
+  </div>
+</div>
+          {/* <div>
             <Label>Policy Booking Date</Label>
             <Input name="policyBookingDate" type="date" />
-          </div>
-<div>
+          </div> */}
+{/* <div>
   <Label>State</Label>
   <div className="relative">
     <Select
@@ -147,6 +190,34 @@ const states = [
       <ChevronDownIcon />
     </span>
   </div>
+</div> */}
+<div>
+  <Label>Sales Channel / Market</Label>
+  <select
+    name="salesChannel"
+    required
+    className="w-full border px-3 py-2 rounded"
+  >
+    <option value="">Select Market</option>
+    <option value="Retail">Retail</option>
+    <option value="Online">Online</option>
+    <option value="Agency">Agency</option>
+    <option value="Distributor">Distributor</option>
+  </select>
+</div>
+<div>
+  <Label>Pincode</Label>
+  <Input name="pincode" type="text" onChange={handleChange} />
+</div>
+
+<div>
+  <Label>City</Label>
+  <Input name="city" type="text" defaultValue={location.city} readOnly />
+</div>
+
+<div>
+  <Label>State</Label>
+  <Input name="state" type="text" defaultValue={location.state} readOnly />
 </div>
 
             <div>

@@ -12,7 +12,7 @@ import Alert from "../ui/alert/Alert";
 export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("DEALER"); // Default role
+ // const [role, setRole] = useState("DEALER"); // Default role
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
@@ -27,7 +27,7 @@ const handleLogin = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password, role }),
+      body: JSON.stringify({ email, password }),
     });
 
     if (res.ok) {
@@ -120,7 +120,7 @@ const handleLogin = async () => {
               </div>
             </div> */}
               <div className="space-y-6">
-                <div>
+                {/* <div>
                   <Label>
                     Choose your role <span className="text-error-500">*</span>{" "}
                   </Label>
@@ -134,7 +134,7 @@ const handleLogin = async () => {
               <option value="SUPERADMIN">Superadmin</option>
             </select>
 
-                </div>
+                </div> */}
                 <div>
                   <Label>
                     Email <span className="text-error-500">*</span>{" "}

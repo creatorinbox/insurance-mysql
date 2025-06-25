@@ -1,166 +1,155 @@
-'use client';
+"use client";
+import { useState, useEffect } from "react";
+import Label from "@/components/form/Label";
+import Input from "@/components/form/input/InputField";
 
-import React, { useState } from 'react';
 
-interface RelatedOption {
-  id: string;
-  display: string;
-  mobile: string;
-}
 
-export default function CreateUserPage() {
+export default function CreateDistributorPage() {
+
+const [location, setLocation] = useState({ city: "", state: "" });
+
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    mobile: '',
-    role: 'DEALER',
-    referenceId: '', // stores related table id
+    name: "",
+    email: "",
+    password: "",
+      confirmPassword: "", // ✅ Add this
+    mobile: "",
+    address: "",
+   // city: "",
+    //state: "",
+    gstNumber: "",
+    contactPerson: "",
+    contactMobile: "",
+    region: "",
+        pinCode: "",
+
   });
 
-  const [relatedOptions, setRelatedOptions] = useState<RelatedOption[]>([]);
+  useEffect(() => {
+ 
+     console.log("📍 City:", location.city);
+  console.log("📍 State:", location.state);
+  }, [location]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = async (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-  const handleRoleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedRole = e.target.value;
-    setFormData({ ...formData, role: selectedRole, referenceId: '' });
+ 
+  if (name === "pinCode" && value.length === 6) {
+    try {
+      const res = await fetch("/api/pincode-lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pincode: value }),
+      });
 
-    let endpoint = '';
-    switch (selectedRole) {
-      case 'DEALER':
-        endpoint = '/api/dealer';
-        break;
-      case 'DISTRIBUTOR':
-        endpoint = '/api/distributor';
-        break;
-      case 'NBFC':
-        endpoint = '/api/nbfcs';
-        break;
-      case 'BANK':
-        endpoint = '/api/banks';
-        break;
-        case 'CUSTOMER':
-        endpoint = '/api/customer';
-        break;
-      default:
-        setRelatedOptions([]);
-        return;
+      const data = await res.json();
+
+      if (res.ok) {
+        console.log("locationres",data.city)
+        setLocation({ city: data.city, state: data.state });
+      }
+    } catch (error:unknown) {
+      console.error("Failed to fetch location", error);
     }
-
-    const res = await fetch(endpoint, { credentials: 'include' });
-    const data = await res.json();
-    setRelatedOptions(data);
+  }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      const res = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).{8,}$/;
 
-      if (!res.ok) throw new Error('User creation failed');
-      const result = await res.json();
-      alert(`User ${result.name} created!`);
-    } catch (error) {
-      alert('Error creating user');
-      console.error(error);
+    if (!passwordRegex.test(formData.password)) {
+      alert(
+        "Password must be at least 8 characters long and include a capital letter, a lowercase letter, a number, and a special character."
+      );
+      return;
+    }
+
+  const payload = {
+    ...formData,
+    city: location.city,
+  state: location.state,
+  };
+    const res = await fetch("/api/users", {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (res.ok) {
+      alert("User created!");
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+          confirmPassword: "", // ✅ Add this
+        mobile: "",
+        address: "",
+       // city: "",
+        //state: "",
+        gstNumber: "",
+        contactPerson: "",
+        contactMobile: "",
+        region: "",
+    
+        pinCode: "",
+
+      });
+     
+    } else {
+      alert("Failed to create distributor.");
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto p-4">
-      <h1 className="text-xl font-bold mb-4">Create User</h1>
+    <div className="max-w-xl mx-auto p-6">
+      <h1 className="text-2xl font-semibold mb-4">Create Distributor</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block font-semibold mb-1">Name</label>
-          <input
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            type="text"
-            className="w-full border p-2 rounded"
-            required
-          />
-        </div>
-        <div>
-          <label className="block font-semibold mb-1">Mobile</label>
-          <input
-            name="mobile"
-            value={formData.mobile}
-            onChange={handleChange}
-            type="text"
-            className="w-full border p-2 rounded"
-            required
-          />
-        </div>
-        <div>
-          <label className="block font-semibold mb-1">Email</label>
-          <input
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            type="email"
-            className="w-full border p-2 rounded"
-            required
-          />
-        </div>
-        <div>
-          <label className="block font-semibold mb-1">Password</label>
-          <input
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            type="password"
-            className="w-full border p-2 rounded"
-            required
-          />
-        </div>
-        <div>
-          <label className="block font-semibold mb-1">Role</label>
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleRoleChange}
-            className="w-full border p-2 rounded"
-          >
-            <option value="DEALER">Dealer</option>
-            <option value="DISTRIBUTOR">Distributor</option>
-            <option value="NBFC">NBFC</option>
-            <option value="BANK">Bank</option>
-            <option value="SUPERADMIN">Super Admin</option>
-            <option value="CUSTOMER">Customer</option>
-          </select>
-        </div>
+        {Object.entries(formData)
+          .filter(([key]) => key !== "planId")
+          .map(([key, val]) => (
+            <div key={key}>
+              <label className="block mb-1 capitalize">
+                {key.replace(/([A-Z])/g, " $1")}
+              </label>
+              <input
+                type="text"
+                name={key}
+                value={val}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+        ))}
 
-        {relatedOptions.length > 0 && (
-          <div>
-            <label className="block font-semibold mb-1">Select {formData.role}</label>
-            <select
-              name="referenceId"
-              value={formData.referenceId}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              required
-            >
-              <option value="">Select</option>
-              {relatedOptions.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.mobile || item.mobile}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+<div>
+  <Label>City</Label>
+  <Input name="city" type="text" defaultValue={location.city} onChange={handleChange} readOnly />
+</div>
 
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Create User
+<div>
+  <Label>State</Label>
+  <Input name="state" type="text" defaultValue={location.state} onChange={handleChange} readOnly />
+</div>
+
+
+
+
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Submit
         </button>
       </form>
     </div>

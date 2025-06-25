@@ -41,6 +41,7 @@ model customer {
   postCode     String
   email        String   @unique
   kyc          String
+  kycNumber    String
   dateOfBirth  DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime
@@ -72,6 +73,10 @@ model dealer {
   plan                    Int
   passwordUpdatedAt       DateTime? @default(now())
   tier                    String?
+  city              String
+  state             String
+  pinCode           String
+  note              String
 }
 
 model dealerpayment {
@@ -110,6 +115,8 @@ model distributor {
   status            String
   plan              Int
   passwordUpdatedAt DateTime? @default(now())
+    note              String
+
 }
 
 model insurance {
@@ -143,7 +150,6 @@ model insurance {
   policyBookingDate       DateTime
   membershipFees          Float?
   SalesAmount             Float?
-
   brokerDetails           String
   locationCode            String
   loanApiIntegration      String
@@ -152,6 +158,7 @@ model insurance {
   userId                  Int
   dueamount               Float?
   paidstatus              String
+  warrenty                String?
 }
 
 model payment {
@@ -215,6 +222,7 @@ model PolicyPricing {
   ew3Year    Int?
   adld       Int?
   combo1Year Int?
+  brokerDetials String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime
 }
@@ -257,4 +265,34 @@ enum user_role {
   BANK
   SUPERADMIN
   CUSTOMER
+}
+model IndiaLocation {
+  id       Int    @id @default(autoincrement())
+  state    String
+  district String
+  city     String
+  pincode  Int
+}
+model PlanCode {
+  id            Int     @id @default(autoincrement())
+  planCode       String     
+  name           String   // e.g., "Piranu Synergy EW 1+1"
+  type           String   // e.g., "EW" or "ADLD"
+  minAmount      Int?     // Optional: minimum price band
+  maxAmount      Int?     // Optional: maximum price band
+  priceAmount    Int?     // Optional: fixed price if applicable
+  createdAt      DateTime @default(now())
+}
+model UserMeta {
+  id         Int      @id @default(autoincrement())
+  role       user_role // Enum: SUPERADMIN, DEALER, DISTRIBUTOR
+  roleId     Int       // Foreign key to the respective table
+  name        String
+  email      String
+  password   String
+  city       String?
+  state      String?
+  pincode    String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }

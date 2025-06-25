@@ -164,6 +164,7 @@ const kitNumber = `${prefix}${stateCode}${currentMonth}${yearCode}${generateSeri
         loanApiIntegration: form.get("loanApiIntegration")?.toString() || "",
         userId: user.id,
         dueamount:parseFloat(form.get("membershipFees")?.toString() || "0"),
+        warrenty:form.get("planCodeId")?.toString() || "",
         paidstatus:"pending",
         updatedAt:new Date(),
       },

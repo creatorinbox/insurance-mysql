@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import jwt from "jsonwebtoken";
 import { redirect } from "next/navigation";
 import Image from "next/image";
-
+import DownloadButton from '@/components/DownloadButton';
 interface JwtPayload {
   id: number;
   role: "DEALER" | "DISTRIBUTOR" | "SUPERADMIN";
@@ -18,16 +18,16 @@ export default async function InvoicePage({ params }: Props) {
   // 1. Extract & verify token
   const cookieStore =await cookies();
   const token = cookieStore.get("token")?.value;
-
+const id = parseInt(params.id, 10);
   if (!token) {
-    return <div className="p-8 text-red-600">Unauthorized: No token found</div>;
+      return redirect("/signin");
   }
 
   let decoded: JwtPayload;
   try {
     decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
   } catch  {
-    return <div className="p-8 text-red-600">Unauthorized: Invalid token</div>;
+     return redirect("/signin");
   }
 
   const userId = decoded.id;
@@ -36,7 +36,7 @@ export default async function InvoicePage({ params }: Props) {
 
   // 2. Fetch payment + dealer info
   const payment = await prisma.payment.findUnique({
-    where: { id: parseInt(params.id,10) }
+    where: { id }
   });
 
   if (!payment) return <div className="p-8">Invoice not found</div>;
@@ -54,15 +54,16 @@ const dealer = await prisma.dealer.findUnique({
     });
   // 3. If dealer, ensure they are viewing only their own invoice
   if (userRole === "DEALER" && payment.dealerId !== userId) {
-    redirect("/unauthorized");
+         return redirect("/signin");
+
   }
 
 // const dealerName = payment.dealer?.dealerName ?? "Unknown Dealer";
 
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-6">
-      <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-md p-8 border border-gray-200">
-        <h1 className="text-3xl font-bold mb-6 text-center border-b pb-4">INVOICE<Image src={company?.logoUrl || "/images/logo/default.png"} alt="Company Logo" width={54} height={20} /></h1>
+      <div id="invoice" className="max-w-3xl mx-auto bg-white shadow-lg rounded-md p-8 border border-gray-200">
+        <h1 className="text-3xl font-bold mb-6 text-center border-b pb-4">INVOICE<Image src={company?.logoUrl || "/images/logo/logo-qyk-care.jpg"} alt="Company Logo" width={54} height={20} /></h1>
 
         <div className="mb-6 grid grid-cols-2 text-sm text-gray-700">
           <div>
@@ -117,6 +118,18 @@ const dealer = await prisma.dealer.findUnique({
           Thank you for your payment. Please retain this invoice for your records.
         </div>
       </div>
-    </div>
+<DownloadButton
+  invoice={{
+    dealerName: dealer?.dealerName || '',
+    email: decoded.email,
+    location: dealer?.dealerLocation || '',
+    invoiceNumber: payment.invoiceNumber,
+    date: new Date(payment.createdAt).toLocaleDateString(),
+    time: new Date(payment.createdAt).toLocaleTimeString(),
+    baseAmount: payment.baseAmount,
+    discount: payment.discount,
+    amount: payment.amount
+  }}
+/>    </div>
   );
 }

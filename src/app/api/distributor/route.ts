@@ -43,9 +43,23 @@ export async function POST(req: NextRequest) {
         userId:parseInt(user.id,10),
         plan:body.planId,
         updatedAt: new Date(), // ✅ Manually added
+        note:"",
       },
     });
+await prisma.userMeta.create({
+      data: {
+         role: 'DISTRIBUTOR',
+      roleId: distributor.id,
+      name: distributor.name,
+      email: distributor.email,
+      password:distributor.password,
+      city:distributor.city,
+      state:distributor.state,
+      pincode:distributor.pinCode,
+updatedAt:new Date(),
 
+          },
+    });
     return NextResponse.json(distributor, { status: 201 });
   } catch (error) {
     console.error("[CREATE_DISTRIBUTOR_ERROR]", error);

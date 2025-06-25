@@ -52,7 +52,50 @@ const checkAndUpdateExpiredPolicies = async () => {
         invoiceTotal += ins.SalesAmount ?? 0;
         dueTotal += ins.dueamount ?? 0;
       }
+    const insuranceCount = insurances.length;
 
+    if (dueTotal > 0) {
+      eligibleForPayment = true;
+
+      const dealer = await prisma.dealer.findUnique({
+        where: { id: parseInt(userId,10) },
+      });
+
+      if (dealer?.plan) {
+       const plan = await prisma.plan.findFirst({
+  where: {
+    id: dealer.plan,
+    role: 'DEALER',
+  },
+  include: {
+    tiers: {
+      orderBy: {
+        insuranceCount: "desc",
+      },
+    },
+  },
+});
+
+        const matchingTier = plan?.tiers.find(
+          (tier) => tier.insuranceCount <= insuranceCount
+        );
+
+        if (matchingTier) discount = matchingTier.discountPercent;
+      }
+
+      const baseRate = 15;
+      effectiveDeduction = isMonthEnd && discount > 0 ? baseRate - discount : baseRate;
+
+      if (isMonthEnd && discount > 0) {
+        const discValue = (invoiceTotal * discount) / 100;
+        const adjusted = (dueTotal * baseRate) / 100;
+        const diff = discValue - adjusted;
+        finalDue = dueTotal - diff;
+      } else {
+       // finalDue = dueTotal - (dueTotal * baseRate / 100);
+        finalDue = dueTotal;
+      }
+    }
       // const payments = await prisma.payment.findMany({
       //   where: {
       //     dealerId: dealer.id,
@@ -188,8 +231,9 @@ paidAmount=paidAmount;
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-2 text-gray-600">Total Due Amount</h2>
           <p className="text-2xl font-bold text-red-600">₹ {dueTotal.toFixed(2)}</p>
+        {/* {role === "DISTRIBUTOR" && eligibleForPayment && ( */}
 
-          {role === "DISTRIBUTOR" && eligibleForPayment && (
+          { eligibleForPayment && (
             <div className="mt-4 space-y-1">
               <p>Commission Rate: 15%</p>
               {isMonthEnd && discount > 0 && (

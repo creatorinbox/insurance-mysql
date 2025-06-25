@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
       postCode,
       kyc,
       dateOfBirth,
+      kycNumber,
     } = payload;
 
     // Validate unique mobile
@@ -73,6 +74,7 @@ export async function POST(req: NextRequest) {
         state,
         postCode,
         kyc,
+        kycNumber,
         dateOfBirth: new Date(dateOfBirth),
         userId: user.id,
         status: "ACTIVE",

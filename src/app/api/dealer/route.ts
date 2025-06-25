@@ -59,9 +59,29 @@ export async function POST(req: NextRequest) {
        tier:form.get("tier")?.toString() || "",
         userId:user.id,
         updatedAt:new Date(),
+        city:form.get("city")?.toString() || "",
+                state:form.get("state")?.toString() || "",
+
+                        pinCode:form.get("pincode")?.toString() || "",
+
+                                note:form.get("note")?.toString() || "",
+
       },
     });
+await prisma.userMeta.create({
+      data: {
+         role: 'DEALER',
+      roleId: dealer.id,
+      name: dealer.dealerName,
+      email: dealer.email,
+      password:dealer.password,
+      city:dealer.city,
+      state:dealer.state,
+      pincode:dealer.pinCode,
+updatedAt:new Date(),
 
+          },
+    });
     return NextResponse.json(dealer, { status: 201 });
   } catch (error) {
     console.error("[DEALER_CREATE_ERROR]", error);
@@ -94,7 +114,11 @@ export async function GET(req: Request) {
     return NextResponse.json({ message: "Invalid token" }, { status: 403 });
   }
   try {
-  const dealers = await prisma.dealer.findMany();
+ const dealers = await prisma.dealer.findMany({
+      where: {
+        userId: user.id,
+      },
+    });
   return NextResponse.json(dealers, { status: 200 });
 } catch (error: unknown) {
   const err = error as { message?: string };

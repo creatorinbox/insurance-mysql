@@ -120,11 +120,11 @@ const handleUpdateStatus = async (policyId: string, newStatus: string) => {
       case "combo1Year":
         return "QYK Shield";
       case "ew1Year":
-        return "QYK Pro 1 Year";
+        return "QYK Protect 1 Year";
       case "ew2Year":
-        return "QYK Pro 2 Year";
+        return "QYK Protect 2 Year";
       case "ew3Year":
-        return "QYK Pro 3 Year";
+        return "QYK Protect 3 Year";
       default:
         return item.policyType;
     }

@@ -13,6 +13,7 @@ interface Customer {
   state: string;
   postCode: string;
   kyc: string;
+  kycNumber:string;
   dateOfBirth: string;
 }
 interface Props {
@@ -33,6 +34,7 @@ export default function AddCustomerModal({ isOpen, onClose,isEdit, customer  }: 
     state: "",
     postCode: "",
     kyc: "",
+    kycNumber:"",
     dateOfBirth: "",
   });
 
@@ -49,15 +51,44 @@ export default function AddCustomerModal({ isOpen, onClose,isEdit, customer  }: 
         state: customer.state || "",
         postCode: customer.postCode || "",
         kyc: customer.kyc || "",
+        kycNumber:customer.kycNumber || "",
         dateOfBirth: customer.dateOfBirth ? customer.dateOfBirth : "",
       });
     } 
   }, [isOpen, isEdit, customer]);
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-  
-  const handleSubmit = async () => {
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setFormData({ ...formData, [e.target.name]: e.target.value });
+  // };
+  const handleChange = async (
+  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => {
+  const { name, value } = e.target;
+  setFormData({ ...formData, [name]: value });
+
+  if (name === 'postCode' && value.length === 6) {
+    try {
+      const res = await fetch('/api/pincode-lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pincode: value }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setFormData((prev) => ({
+          ...prev,
+          city: data.city,
+          state: data.state,
+        }));
+      }
+    } catch (error: unknown) {
+      console.error('Failed to lookup pincode', error);
+    }
+  }
+};
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault(); // ✅ Prevents page reload
     const endpoint = isEdit ? "/api/customer/update" : "/api/customer/create";
   
     // Ensure original mobile number is passed for update
@@ -108,7 +139,22 @@ export default function AddCustomerModal({ isOpen, onClose,isEdit, customer  }: 
       <div className="bg-white p-6 rounded-lg w-[500px] space-y-4">
         <h2 className="text-lg font-semibold">Add New Customer</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input name="title" value={formData.title}  placeholder="Title" onChange={handleChange} />
+          {/* <Input name="title" value={formData.title}  placeholder="Title" onChange={handleChange} /> */}
+          <div>
+  <label className="block text-sm font-medium text-gray-700">Title</label>
+  <select
+    name="title"
+    value={formData.title}
+    onChange={handleChange}
+    required
+    className="w-full p-2 border rounded"
+  >
+    <option value="">Select</option>
+    <option value="Mr.">Mr.</option>
+    <option value="Mrs.">Mrs.</option>
+    <option value="Ms.">Ms.</option>
+  </select>
+</div>
           <Input name="customerName" value={formData.customerName} placeholder="Customer Name" onChange={handleChange} />
           <Input
   name="mobile"
@@ -120,10 +166,37 @@ export default function AddCustomerModal({ isOpen, onClose,isEdit, customer  }: 
           {/* <Input name="mobile" value={formData.mobile} placeholder="Mobile" onChange={handleChange} /> */}
           <Input name="email" value={formData.email} placeholder="Email" onChange={handleChange} />
           <Input name="address1" value={formData.address1} placeholder="Address Line 1" onChange={handleChange} />
-          <Input name="city" value={formData.city}  placeholder="City" onChange={handleChange} />
-          <Input name="state" value={formData.state}  placeholder="State" onChange={handleChange} />
-          <Input name="postCode" value={formData.postCode}  placeholder="Post Code" onChange={handleChange} />
-          <Input name="kyc"  value={formData.kyc} placeholder="KYC Type" onChange={handleChange} />
+                    <Input name="postCode" value={formData.postCode}  placeholder="Post Code" onChange={handleChange} />
+
+         <Input name="city" value={formData.city} placeholder="City" onChange={handleChange} />
+<Input name="state" value={formData.state} placeholder="State" onChange={handleChange} />
+          {/* <Input name="kyc"  value={formData.kyc} placeholder="KYC Type" onChange={handleChange} /> */}
+          <div>
+  <label className="block text-sm font-medium text-gray-700">KYC Type</label>
+  <select
+    name="kyc"
+    value={formData.kyc}
+    onChange={handleChange}
+    required
+    className="w-full p-2 border rounded"
+  >
+    <option value="">Select KYC</option>
+    <option value="PAN Card">PAN Card</option>
+    <option value="Aadhaar">Aadhaar</option>
+    <option value="Voter ID">Voter ID</option>
+    <option value="Passport">Passport</option>
+  </select>
+</div>
+
+{formData.kyc && (
+  <Input
+    name="kycNumber"
+    value={formData.kycNumber}
+    placeholder="KYC Number"
+    onChange={handleChange}
+  />
+)}  <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
+
           <Input name="dateOfBirth" value={formData.dateOfBirth}  type="date" placeholder="Date of Birth" onChange={handleChange} />
           <div className="flex justify-end gap-2">
             <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">Cancel</button>

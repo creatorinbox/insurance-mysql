@@ -35,7 +35,8 @@ export default function DistributorPaymentsPage() {
 const [bulkPaymentData, setBulkPaymentData] = useState<BulkPaymentData | null>(null);
   const router = useRouter();
 const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
-
+const [noteModalDealerId, setNoteModalDealerId] = useState<number | null>(null)
+const [noteText, setNoteText] = useState("")
 function toggleDropdown(dealerId: number) {
   setOpenDropdownId(openDropdownId === dealerId ? null : dealerId);
 }
@@ -101,6 +102,23 @@ function closeDropdown() {
       dueAmount:dueAmount,
     });
   };
+  const handleBlockWithNote = async (dealerId: number, note: string) => {
+  const res = await fetch(`/api/dealer/${dealerId}/block`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ note })
+  })
+
+  if (res.ok) {
+    alert("Dealer blocked successfully.")
+    const updated = await fetch("/api/distributor-payments", { credentials: "include" })
+    const data = await updated.json()
+    setDealers(data)
+  } else {
+    alert("Failed to block dealer.")
+  }
+}
 const handleAction = async (id: number, action: "block" | "terminate"| "active") => {
     const confirmMsg = `Are you sure you want to ${action} this dealer?`;
     if (!window.confirm(confirmMsg)) return;
@@ -209,7 +227,7 @@ const handleAction = async (id: number, action: "block" | "terminate"| "active")
               <td className="p-2">{dealer.dealerName}</td>
               <td className="p-2">{dealer.dealerLocation}</td>
               <td className="p-2">{dealer.salesAmount ? `₹ ${dealer.salesAmount}` : ""}</td>
-              <td className="p-2">{dealer.dueAmount ? `₹ ${dealer.dueAmount}` : "Paid"}</td>
+              <td className="p-2">{dealer.dueAmount ? `₹ ${dealer.dueAmount}` : ""}</td>
 
               <td className="p-2">
                 <button
@@ -298,7 +316,10 @@ const handleAction = async (id: number, action: "block" | "terminate"| "active")
     <Dropdown isOpen={true} onClose={closeDropdown} className="absolute right-0 mt-2 w-40 bg-white shadow-md rounded-md p-2">
       {dealer.status === "ACTIVE" && (
         <>
-          <DropdownItem onItemClick={() => handleAction(dealer.id, "block")}>Block Dealer</DropdownItem>
+          {/* <DropdownItem onItemClick={() => handleAction(dealer.id, "block")}>Block Dealer</DropdownItem> */}
+           <DropdownItem onItemClick={() => setNoteModalDealerId(dealer.id)}>
+      Block Dealer
+    </DropdownItem>
           <DropdownItem onItemClick={() => handleAction(dealer.id, "terminate")}>Terminate Dealer</DropdownItem>
         </>
       )}
@@ -336,6 +357,41 @@ const handleAction = async (id: number, action: "block" | "terminate"| "active")
           ))}
         </tbody>
       </table>
+      {noteModalDealerId && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white p-6 rounded-md max-w-sm w-full shadow-lg">
+      <h2 className="text-lg font-semibold mb-2">Add Block Note</h2>
+      <textarea
+        className="w-full border p-2 mb-4"
+        rows={4}
+        value={noteText}
+        onChange={(e) => setNoteText(e.target.value)}
+        placeholder="Enter reason for blocking this dealer"
+      />
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => {
+            setNoteText("")
+            setNoteModalDealerId(null)
+          }}
+          className="px-4 py-2 bg-gray-300 rounded"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={() => {
+            handleBlockWithNote(noteModalDealerId, noteText)
+            setNoteText("")
+            setNoteModalDealerId(null)
+          }}
+          className="px-4 py-2 bg-red-600 text-white rounded"
+        >
+          Block
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
