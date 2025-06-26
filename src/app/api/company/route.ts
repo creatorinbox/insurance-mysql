@@ -1,32 +1,27 @@
 import { prisma } from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 
-interface JwtPayload {
-  id: number;
-  role: string;
-}
 
-export async function GET(req: NextRequest) {
+
+export async function GET() {
   try {
     // ✅ Extract JWT token for authentication (optional)
-    const token = req.headers.get("cookie")?.split("token=")[1]?.split(";")[0];
+    // const token = req.headers.get("cookie")?.split("token=")[1]?.split(";")[0];
 
-    if (!token) {
-       return redirect("/signin");
-      //return NextResponse.json({ error: "Unauthorized - Token missing" }, { status: 401 });
-    }
+    // if (!token) {
+    //    return redirect("/signin");
+    //   //return NextResponse.json({ error: "Unauthorized - Token missing" }, { status: 401 });
+    // }
 
-    let user: { id: number; role: string };
-    try {
-      user = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-       if (!user) {
-      return NextResponse.json({ error: "Unauthorized - User missing" }, { status: 401 });
-    }
-    } catch {
-      return NextResponse.json({ error: "Invalid token" }, { status: 403 });
-    }
+    // let user: { id: number; role: string };
+    // try {
+    //   user = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    //    if (!user) {
+    //   return NextResponse.json({ error: "Unauthorized - User missing" }, { status: 401 });
+    // }
+    // } catch {
+    //   return NextResponse.json({ error: "Invalid token" }, { status: 403 });
+    // }
 
     // ✅ Fetch company details from database
     const company = await prisma.companyBranding.findFirst({
