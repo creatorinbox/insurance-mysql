@@ -1,5 +1,7 @@
 "use client";
-import React from "react";
+
+import React, { useEffect, useState } from "react";
+//import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -7,10 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { useRouter } from "next/navigation"
-//import Badge from "../ui/badge/Badge";
-//import Image from "next/image";
-import { useEffect, useState } from "react";
 
 interface Policy {
   id: string;
@@ -22,163 +20,92 @@ interface Policy {
   ew3Year?: number;
   adld?: number;
   combo1Year?: number;
-  invoiceAmount:number
+  invoiceAmount: number;
   createdAt: Date;
   updatedAt: Date;
-  brokerDetials?:string;
+  brokerDetials?: string;
 }
+
 interface PolicyTableOneProps {
   userRole: string | null;
 }
-// export default function PolicyTableOne() {
+
 export default function PolicyTableOne({ userRole }: PolicyTableOneProps) {
   const [policies, setPolicies] = useState<Policy[]>([]);
-  //const CURRENT_USER_ROLE = "SUPERADMIN";
-const router = useRouter()
+  const [activeTab, setActiveTab] = useState<string>("");
+ // const router = useRouter();
 
   useEffect(() => {
     async function fetchPolicies() {
       const res = await fetch("/api/policy");
       const data = await res.json();
       setPolicies(data);
+      if (data.length > 0) {
+        setActiveTab(data[0].category); // Set default tab to the first category
+      }
     }
 
     fetchPolicies();
   }, []);
-  // const handleApprove = async (id: string) => {
-  //   try {
-  //     const res = await fetch(`/api/policy/approve/${id}`, {
-  //       method: "PATCH",
-  //     });
 
-  //     if (!res.ok) throw new Error("Approval failed");
+  const categories = [...new Set(policies.map((p) => p.category))];
 
-  //     // Update state optimistically
-  //     setPolicies((prev) =>
-  //       prev.map((policy) =>
-  //         policy.id === id ? { ...policy, status: "active" } : policy
-  //       )
-  //     );
-  //   } catch (err) {
-  //     console.error("Approval error:", err);
-  //   }
-  // };
- return (
-  // <div className="space-y-10">
-  //   {Object.entries(
-  //     policies.reduce((acc, policy) => {
-  //       if (!acc[policy.category]) acc[policy.category] = [];
-  //       acc[policy.category].push(policy);
-  //       return acc;
-  //     }, {} as Record<string, Policy[]>)
-  //   ).map(([category, categoryPolicies]) => (
-  //     <div key={category}>
-  //       <h2 className="text-lg font-semibold mb-2">{category} Policies</h2>
-  //       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-  //         <div className="max-w-full overflow-x-auto">
-  //           <div className="min-w-[1102px]">
-  //             <Table>
-  //               <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-  //                 <TableRow>
-  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ADLD</TableCell>
-  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">COMBO</TableCell>
-  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Min Amount</TableCell>
-  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Max Amount</TableCell>
-  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ew1Year</TableCell>
-  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ew2Year</TableCell>
-  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ew3Year</TableCell>
-  //                   <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Created Date</TableCell>
-  //                 </TableRow>
-  //               </TableHeader>
-  //               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-  //                 {categoryPolicies.map((policy) => (
-  //                   <TableRow key={policy.id}>
-  //                     <TableCell className="px-4 py-3">{policy.adld}</TableCell>
-  //                     <TableCell className="px-4 py-3">{policy.combo1Year}</TableCell>
-  //                     <TableCell className="px-4 py-3">{policy.minAmount}</TableCell>
-  //                     <TableCell className="px-4 py-3">{policy.maxAmount}</TableCell>
-  //                     <TableCell className="px-4 py-3">{policy.ew1Year}</TableCell>
-  //                     <TableCell className="px-4 py-3">{policy.ew2Year}</TableCell>
-  //                     <TableCell className="px-4 py-3">{policy.ew3Year}</TableCell>
-  //                     <TableCell className="px-4 py-3">
-  //                       {new Date(policy.createdAt).toLocaleDateString()}
-  //                     </TableCell>
-  //                   </TableRow>
-  //                 ))}
-  //               </TableBody>
-  //             </Table>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   ))}
-  // </div>
-  <div className="space-y-10">
-    {Object.entries(
-      policies.reduce((acc, policy) => {
-        if (!acc[policy.category]) acc[policy.category] = [];
-        acc[policy.category].push(policy);
-        return acc;
-      }, {} as Record<string, Policy[]>)
-    ).map(([category, categoryPolicies]) => (
-      <div key={category}>
-        <h2 className="text-lg font-semibold mb-2">{category}</h2>
+  const renderTable = (category: string) => {
+    const filtered = policies.filter((p) => p.category === category);
+
+    return (
+      <div className="mt-4">
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
           <div className="max-w-full overflow-x-auto">
-            <div className="min-w-[1102px]">
+            <div className="">
               <Table>
-                <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                <TableHeader>
                   <TableRow>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Invoice Value</TableCell>
-                   
+                    {userRole === "SUPERADMIN" ? (
+                      <>
+                                          <TableCell isHeader>Invoice Value</TableCell>
 
-  {userRole === "SUPERADMIN" ? (
-    <>
-        <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">ADLD-1Yr</TableCell>
+                        <TableCell isHeader>ADLD-1Yr</TableCell>
+                        <TableCell isHeader>EW-1Yr</TableCell>
+                        <TableCell isHeader>EW-2Yrs</TableCell>
+                        <TableCell isHeader>EW-3Yrs</TableCell>
+                        <TableCell isHeader>COMBO-1Yr</TableCell>
+                      </>
+                    ) : (
+                      <>
+                                          <TableCell isHeader>Invoice Value</TableCell>
 
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">EW-1Yr</TableCell>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">EW-2Yrs</TableCell>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">EW-3Yrs</TableCell>
-       <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">COMBO-1Yr</TableCell>
-                 </> ) : (<>
-      <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Max-1Yr</TableCell>
-
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Protect-1Yr</TableCell>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Protect-2Yrs</TableCell>
-                    <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Protect-3Yrs</TableCell>
-       <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">QYK Shield-1Yr</TableCell>
-     </> )}
-     <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">
-  Broker Details
-</TableCell>    
-            <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">
-  Action
-</TableCell>      
-                    {/* <TableCell isHeader className="px-5 py-3 font-medium text-start text-gray-500 text-theme-xs dark:text-gray-400">Created Date</TableCell> */}
+                        <TableCell isHeader>QYK Max-1Yr</TableCell>
+                        <TableCell isHeader>QYK Protect-1Yr</TableCell>
+                        <TableCell isHeader>QYK Protect-2Yrs</TableCell>
+                        <TableCell isHeader>QYK Protect-3Yrs</TableCell>
+                        <TableCell isHeader>QYK Shield-1Yr</TableCell>
+                      </>
+                    )}
+                    {/* <TableCell isHeader>Broker Details</TableCell>
+                    <TableCell isHeader>Action</TableCell> */}
                   </TableRow>
                 </TableHeader>
-                <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                  {categoryPolicies.map((policy) => (
+                <TableBody>
+                  {filtered.map((policy) => (
                     <TableRow key={policy.id}>
-                      <TableCell className="px-4 py-3">₹ {policy.minAmount/1000}K - ₹ {policy.maxAmount/1000}K</TableCell>
-                      <TableCell className="px-4 py-3">{policy.adld}</TableCell>
-                      <TableCell className="px-4 py-3">{policy.ew1Year}</TableCell>
-                      <TableCell className="px-4 py-3">{policy.ew2Year}</TableCell>
-                      <TableCell className="px-4 py-3">{policy.ew3Year}</TableCell>
-                      <TableCell className="px-4 py-3">{policy.combo1Year}</TableCell>
-                                            <TableCell className="px-4 py-3">{policy.brokerDetials}</TableCell>
-
-                      {/* <TableCell className="px-4 py-3">
-                        {new Date(policy.createdAt).toLocaleDateString()}
+                      <TableCell>₹ {policy.minAmount} - ₹ {policy.maxAmount}</TableCell>
+                      <TableCell>{policy.adld ?policy.adld:'-' }
+                      
+                        </TableCell>
+                      <TableCell>{policy.ew1Year ? '₹'+ policy.ew1Year:'-' } </TableCell>
+                      <TableCell> {policy.ew2Year ? '₹'+ policy.ew2Year:'-' }</TableCell>
+                      <TableCell>{policy.ew3Year ? '₹'+ policy.ew3Year:'-' }</TableCell>
+                      <TableCell>{policy.combo1Year ? '₹'+ policy.combo1Year:'-' }</TableCell>
+                      {/* <TableCell>{policy.brokerDetials}</TableCell>
+                      <TableCell>
+                        <button
+                          onClick={() => router.push(`/policy/edit/${policy.id}`)}
+                          className="text-blue-600 hover:underline"
+                        >
+                          Edit
+                        </button>
                       </TableCell> */}
-                      <TableCell className="px-4 py-3">
-  <button
-    onClick={() => router.push(`/policy/edit/${policy.id}`)}
-    className="text-blue-600 hover:underline"
-  >
-    Edit
-  </button>
-</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -187,7 +114,30 @@ const router = useRouter()
           </div>
         </div>
       </div>
-    ))}
-  </div>
-);
+    );
+  };
+
+  return (
+    <div>
+      {/* Tabs */}
+      <div className="flex space-x-4 border-b pb-2">
+        {categories.map((category) => (
+          <button
+            key={category}
+            onClick={() => setActiveTab(category)}
+            className={`py-2 px-4 text-sm font-medium ${
+              activeTab === category
+                ? "border-b-2 border-blue-500 text-blue-600"
+                : "text-gray-500 hover:text-blue-500"
+            }`}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+
+      {/* Active Tab Content */}
+      {activeTab && renderTable(activeTab)}
+    </div>
+  );
 }
