@@ -25,44 +25,11 @@ export default function CreateDealerPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [selectedPlanId, setSelectedPlanId] = useState<string>("");
    // const [selectedLocationcode, setSelectedLocationcode] = useState<string>("");
-const [location, setLocation] = useState({ city: "", state: "" });
-// const states = [
-//   { value: "01", label: "Andhra Pradesh" },
-//   { value: "02", label: "Arunachal Pradesh" },
-//   { value: "03", label: "Assam" },
-//   { value: "04", label: "Bihar" },
-//   { value: "05", label: "Chhattisgarh" },
-//   { value: "06", label: "Goa" },
-//   { value: "07", label: "Gujarat" },
-//   { value: "08", label: "Haryana" },
-//   { value: "09", label: "Himachal Pradesh" },
-//   { value: "10", label: "Jharkhand" },
-//   { value: "11", label: "Karnataka" },
-//   { value: "12", label: "Kerala" },
-//   { value: "13", label: "Madhya Pradesh" },
-//   { value: "14", label: "Maharashtra" },
-//   { value: "15", label: "Manipur" },
-//   { value: "16", label: "Meghalaya" },
-//   { value: "17", label: "Mizoram" },
-//   { value: "18", label: "Nagaland" },
-//   { value: "19", label: "Odisha" },
-//   { value: "20", label: "Punjab" },
-//   { value: "21", label: "Rajasthan" },
-//   { value: "22", label: "Sikkim" },
-//   { value: "23", label: "Tamil Nadu" },
-//   { value: "24", label: "Telangana" },
-//   { value: "25", label: "Tripura" },
-//   { value: "26", label: "Uttar Pradesh" },
-//   { value: "27", label: "Uttarakhand" },
-//   { value: "28", label: "West Bengal" },
-//   { value: "29", label: "Andaman and Nicobar Islands" },
-//   { value: "30", label: "Chandigarh" },
-//   { value: "31", label: "Dadra and Nagar Haveli" },
-//   { value: "32", label: "Daman and Diu" },
-//   { value: "33", label: "Delhi" },
-//   { value: "34", label: "Lakshadweep" },
-//   { value: "35", label: "Puducherry" },
-// ];
+const [location, setLocation] = useState<{ cities: string[]; state: string }>({
+  cities: [],
+  state: "",
+});
+const [selectedCity, setSelectedCity] = useState<string>("");
   useEffect(() => {
     const fetchPlans = async () => {
       const res = await fetch("/api/plans");
@@ -85,10 +52,10 @@ const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       });
 
       const data = await res.json();
-
-      if (res.ok) {
-        setLocation({ city: data.city, state: data.state });
-      }
+ if (res.ok && Array.isArray(data.cities)) {
+      setLocation({ cities: data.cities, state: data.state });
+      setSelectedCity(data.cities[0] || "");
+    }
     } catch (error:unknown) {
       console.error("Failed to fetch location", error);
     }
@@ -115,6 +82,8 @@ if (password !== confirmPassword) {
   alert("Passwords do not match.");
   return;
 }
+form.append("city", selectedCity);
+form.append("state", location.state);
     const res = await fetch("/api/dealer", {
       method: "POST",
       body: form,
@@ -209,10 +178,22 @@ if (password !== confirmPassword) {
   <Label>Pincode</Label>
   <Input name="pincode" type="text" onChange={handleChange} />
 </div>
-
 <div>
   <Label>City</Label>
-  <Input name="city" type="text" defaultValue={location.city} readOnly />
+  <select
+    name="city"
+    value={selectedCity}
+    onChange={(e) => setSelectedCity(e.target.value)}
+    className="w-full border px-3 py-2 rounded"
+    required
+  >
+    <option value="">-- Select City --</option>
+    {location.cities.map((city) => (
+      <option key={city} value={city}>
+        {city}
+      </option>
+    ))}
+  </select>
 </div>
 
 <div>

@@ -334,12 +334,12 @@ console.log('catval',policies);
                 <Select
                   name="ewYear"
                  options={[
-                          { value: "adld", label: "QYK Max" },
-        { value: "combo1Year", label: "QYK Shield " },
+                          { value: "adld", label: "QYK Protect" },
+        { value: "combo1Year", label: "QYK Max " },
 
-        { value: "ew1Year", label: "QYK Protect 1 Year" },
-        { value: "ew2Year", label: "QYK Protect 2 Year" },
-        { value: "ew3Year", label: "QYK Protect 3 Year" },
+        { value: "ew1Year", label: "QYK Shield 1 Year" },
+        { value: "ew2Year", label: "QYK Shield 2 Year" },
+        { value: "ew3Year", label: "QYK Shield 3 Year" },
       ]}
                   placeholder="Select Extended Warranty Period"
                   onChange={() => {}}
@@ -478,12 +478,13 @@ console.log('catval',policies);
       </p>
       <p><strong>Product:</strong> {planDetails.ewYear}</p>
       <p><strong>Premium Price:</strong> ₹{planDetails.price}</p>
-            <p><strong>Membership Fees(15%):</strong> ₹{(planDetails.price*15/100)}</p>
+            {/* <p><strong>Membership Fees(15%):</strong> ₹{(planDetails.price*15/100)}</p> */}
 
       {/* <p><strong>Invoice Amount:</strong> ₹{formDataToSubmit?.get("invoiceAmount")}</p> */}
       {/* Horizontal Line */}
       <hr className="my-4 border-gray-300" />
-      <p><strong>Due Amount:</strong> ₹{planDetails.price-(planDetails.price*15/100)}</p>
+      {/* <p><strong>Due Amount:</strong> ₹{planDetails.price-(planDetails.price*15/100)}</p> */}
+      
 
       <div className="mt-4 flex justify-end space-x-3">
         <button

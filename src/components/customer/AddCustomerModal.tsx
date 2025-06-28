@@ -37,6 +37,9 @@ export default function AddCustomerModal({ isOpen, onClose,isEdit, customer  }: 
     kycNumber:"",
     dateOfBirth: "",
   });
+const [cities, setCities] = useState<string[]>([]);
+const [state, setStates] = useState<string[]>([]);
+
 
   useEffect(() => {
     if (isOpen && isEdit && customer) {
@@ -75,13 +78,18 @@ export default function AddCustomerModal({ isOpen, onClose,isEdit, customer  }: 
 
       const data = await res.json();
 
-      if (res.ok) {
-        setFormData((prev) => ({
-          ...prev,
-          city: data.city,
-          state: data.state,
-        }));
-      }
+    
+    if (res.ok && Array.isArray(data.cities)) {
+      setCities(data.cities);
+      setStates(data.state);
+
+      setFormData((prev) => ({
+        ...prev,
+        city: data.cities[0] || "", // Default first city
+        state: data.state || "",
+                postCode: value,
+      }));
+    }
     } catch (error: unknown) {
       console.error('Failed to lookup pincode', error);
     }
@@ -168,8 +176,35 @@ const handleSubmit = async (e: React.FormEvent) => {
           <Input name="address1" value={formData.address1} placeholder="Address Line 1" onChange={handleChange} />
                     <Input name="postCode" value={formData.postCode}  placeholder="Post Code" onChange={handleChange} />
 
-         <Input name="city" value={formData.city} placeholder="City" onChange={handleChange} />
-<Input name="state" value={formData.state} placeholder="State" onChange={handleChange} />
+         {/* <Input name="city" value={formData.city} placeholder="City" onChange={handleChange} /> */}
+         <div>
+  <label className="block text-sm font-medium text-gray-700">City</label>
+  <select
+    name="city"
+    value={formData.city}
+    onChange={handleChange}
+    required
+    className="w-full p-2 border rounded"
+  >
+    <option value="">-- Select City --</option>
+    {cities.map((city) => (
+      <option key={city} value={city}>
+        {city}
+      </option>
+    ))}
+  </select>
+</div>
+<div>
+  <label className="block text-sm font-medium text-gray-700">State</label>
+  <input
+    type="text"
+    name="state"
+    value={state}
+    readOnly
+    className="w-full p-2 border rounded bg-gray-100"
+  />
+</div>
+{/* <Input name="state" value={formData.state} placeholder="State" onChange={handleChange} /> */}
           {/* <Input name="kyc"  value={formData.kyc} placeholder="KYC Type" onChange={handleChange} /> */}
           <div>
   <label className="block text-sm font-medium text-gray-700">KYC Type</label>

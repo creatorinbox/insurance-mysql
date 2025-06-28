@@ -87,7 +87,7 @@ const closeDropdown = () => {
             <th className="p-2">Contact Person</th>
             <th className="p-2">Sales Amount</th>
            <th className="p-2">Due Amount</th>
-            <th className="p-2">View Distributor</th>
+            <th className="p-2">View Dealer</th>
                         <th className="p-2">Status</th>
 
             <th className="p-2">Action</th>

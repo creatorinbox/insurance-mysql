@@ -26,6 +26,9 @@ model superadmin {
   updatedAt         DateTime  @updatedAt
   status            String
   passwordUpdatedAt DateTime? @default(now())
+    profileImage           String?
+    brokerDetails    String?
+
 }
 
 model customer {
@@ -77,6 +80,7 @@ model dealer {
   state             String
   pinCode           String
   note              String
+  profileImage           String?
 }
 
 model dealerpayment {
@@ -116,6 +120,8 @@ model distributor {
   plan              Int
   passwordUpdatedAt DateTime? @default(now())
     note              String
+      profileImage           String?
+
 
 }
 

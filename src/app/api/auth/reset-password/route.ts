@@ -51,6 +51,12 @@ export async function POST(req: NextRequest) {
     default:
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
   }
-
+  await prisma.userMeta.updateMany({
+    where: { roleId: parseInt(payload.id) },
+    data: {
+      password: hashedPassword,
+     
+    },
+  });
   return NextResponse.json({ message: "Password reset successful" });
 }

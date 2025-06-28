@@ -19,7 +19,7 @@ type Plan = {
 export default function CreateDistributorPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
-const [location, setLocation] = useState({ city: "", state: "" });
+//const [location, setLocation] = useState({ city: "", state: "" });
 
   const [formData, setFormData] = useState({
     name: "",
@@ -38,7 +38,11 @@ const [location, setLocation] = useState({ city: "", state: "" });
         pinCode: "",
 
   });
-
+const [location, setLocation] = useState({
+  cities: [] as string[],
+  state: "",
+});
+const [selectedCity, setSelectedCity] = useState("");
   useEffect(() => {
     const fetchPlans = async () => {
       const res = await fetch("/api/plans");
@@ -46,7 +50,6 @@ const [location, setLocation] = useState({ city: "", state: "" });
       setPlans(data);
     };
     fetchPlans();
-     console.log("📍 City:", location.city);
   console.log("📍 State:", location.state);
   }, [location]);
 
@@ -71,10 +74,17 @@ const [location, setLocation] = useState({ city: "", state: "" });
 
       const data = await res.json();
 
-      if (res.ok) {
-        console.log("locationres",data.city)
-        setLocation({ city: data.city, state: data.state });
-      }
+      // if (res.ok) {
+      //   console.log("locationres",data.city)
+      //   setLocation({ city: data.city, state: data.state });
+      // }
+         if (res.ok && Array.isArray(data.cities)) {
+      setLocation({
+        cities: data.cities,
+        state: data.state,
+      });
+      setSelectedCity(data.cities[0] || ""); // default select first city
+    }
     } catch (error:unknown) {
       console.error("Failed to fetch location", error);
     }
@@ -97,7 +107,7 @@ const [location, setLocation] = useState({ city: "", state: "" });
   const payload = {
     ...formData,
     planId: parseInt(formData.planId, 10), // ✅ force planId to integer
-    city: location.city,
+    city:selectedCity,
   state: location.state,
   };
     const res = await fetch("/api/distributor", {
@@ -156,8 +166,21 @@ const [location, setLocation] = useState({ city: "", state: "" });
         ))}
 
 <div>
-  <Label>City</Label>
-  <Input name="city" type="text" defaultValue={location.city} onChange={handleChange} readOnly />
+  <Label>Select City</Label>
+  <select
+    name="city"
+    value={selectedCity}
+    onChange={(e) => setSelectedCity(e.target.value)}
+    className="w-full p-2 border rounded"
+    required
+  >
+    <option value="">-- Select City --</option>
+    {location.cities.map((city) => (
+      <option key={city} value={city}>
+        {city}
+      </option>
+    ))}
+  </select>
 </div>
 
 <div>

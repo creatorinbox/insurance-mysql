@@ -10,14 +10,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid pincode' }, { status: 400 });
   }
 
-  const location = await prisma.indiaLocation.findFirst({
-    where: { pincode },
-    select: { city: true, state: true }
+  // Fetch all cities with the provided pincode
+  const results = await prisma.indiaLocation.findMany({
+    where: { pincode: parseInt(pincode, 10) },
+    select: { city: true, state: true },
   });
 
-  if (!location) {
+  if (!results || results.length === 0) {
     return NextResponse.json({ error: 'Pincode not found' }, { status: 404 });
   }
 
-  return NextResponse.json(location);
+  // Collect unique cities
+  const cities = Array.from(new Set(results.map((r) => r.city)));
+  const state = results[0].state;
+
+  return NextResponse.json({ cities, state });
 }

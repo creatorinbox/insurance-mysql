@@ -34,7 +34,9 @@ export default function PolicyTableOne({ userRole }: PolicyTableOneProps) {
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [activeTab, setActiveTab] = useState<string>("");
  // const router = useRouter();
-
+const [brokerDetials, setBrokerDetials] = useState<string>("");
+const [isEditing, setIsEditing] = useState(false);
+const [editText, setEditText] = useState("");
   useEffect(() => {
     async function fetchPolicies() {
       const res = await fetch("/api/policy");
@@ -45,9 +47,40 @@ export default function PolicyTableOne({ userRole }: PolicyTableOneProps) {
       }
     }
 
+ async function fetchBrokerDetails() {
+    const res = await fetch("/api/policy/broker");
+    const data = await res.json();
+console.log('broker',data)
+    if (res.ok) {
+      setBrokerDetials(data.brokerDetails || "");
+    } else {
+      console.error("Failed to fetch broker info:", data.error);
+    }
+  }
+
+  fetchBrokerDetails();
     fetchPolicies();
   }, []);
+const handleBrokerEdit = () => {
+  setEditText(brokerDetials);
+  setIsEditing(true);
+};
 
+const handleSave = async () => {
+  const res = await fetch("/api/policy/broker", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ brokerDetails: editText }),
+  });
+
+  const data = await res.json();
+  if (res.ok) {
+    setBrokerDetials(data.brokerDetails);
+    setIsEditing(false);
+  } else {
+    alert(data.error || "Update failed");
+  }
+};
   const categories = [...new Set(policies.map((p) => p.category))];
 
   const renderTable = (category: string) => {
@@ -55,31 +88,76 @@ export default function PolicyTableOne({ userRole }: PolicyTableOneProps) {
 
     return (
       <div className="mt-4">
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+         <div className=" items-center justify-between mb-4">
+  <div>
+    {userRole === "SUPERADMIN" ? (<>
+<div className="flex items-center justify-between mb-4">
+    
+      <div className="w-full">
+    <h2 className="text-sm">Broker Details</h2>
+    {isEditing ? (
+      <textarea
+        value={editText}
+        onChange={(e) => setEditText(e.target.value)}
+        className="w-full p-2 border text-lg font-semibold  mt-1 "
+        rows={2}
+      />
+    ) : (
+      <p className="text-xl font-semibold">
+        {brokerDetials || "No details available"}
+      </p>
+    )}
+  </div>
+  <div className="ml-4 shrink-0">
+    {isEditing ? (
+      <button
+        onClick={handleSave}
+        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+      >
+        Save
+      </button>
+  ) : (
+      <button
+        onClick={handleBrokerEdit}
+        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+      >
+        Edit
+      </button>
+    )}
+  </div>
+</div>
+   
+                   </>   ) : (
+                      <>
+                      <div></div> </>)}
+</div>
+</div>
+        <div className="overflow-hidden rounded-xl border border-gray-400  border-1">
+        
           <div className="max-w-full overflow-x-auto">
             <div className="">
               <Table>
                 <TableHeader>
-                  <TableRow>
+                  <TableRow className="bg-gray-200">
                     {userRole === "SUPERADMIN" ? (
                       <>
-                                          <TableCell isHeader>Invoice Value</TableCell>
+                                          <TableCell className="border-1 border-gray-400" isHeader>Invoice Value</TableCell>
 
-                        <TableCell isHeader>ADLD-1Yr</TableCell>
-                        <TableCell isHeader>EW-1Yr</TableCell>
-                        <TableCell isHeader>EW-2Yrs</TableCell>
-                        <TableCell isHeader>EW-3Yrs</TableCell>
-                        <TableCell isHeader>COMBO-1Yr</TableCell>
+                        <TableCell className="border-1 border-gray-400" isHeader>ADLD-1Yr</TableCell>
+                        <TableCell className="border-1 border-gray-400" isHeader>EW-1Yr</TableCell>
+                        <TableCell className="border-1 border-gray-400"isHeader>EW-2Yrs</TableCell>
+                        <TableCell className="border-1 border-gray-400" isHeader>EW-3Yrs</TableCell>
+                        <TableCell className="border-1 border-gray-400" isHeader>COMBO-1Yr</TableCell>
                       </>
                     ) : (
                       <>
-                                          <TableCell isHeader>Invoice Value</TableCell>
+                                          <TableCell className="border-1 border-gray-400" isHeader>Invoice Value</TableCell>
 
-                        <TableCell isHeader>QYK Max-1Yr</TableCell>
-                        <TableCell isHeader>QYK Protect-1Yr</TableCell>
-                        <TableCell isHeader>QYK Protect-2Yrs</TableCell>
-                        <TableCell isHeader>QYK Protect-3Yrs</TableCell>
-                        <TableCell isHeader>QYK Shield-1Yr</TableCell>
+                        <TableCell className="border-1 border-gray-400" isHeader>QYK Protect-1Yr</TableCell>
+                        <TableCell className="border-1 border-gray-400" isHeader>QYK Shield-1Yr</TableCell>
+                        <TableCell className="border-1 border-gray-400" isHeader>QYK Shield-2Yrs</TableCell>
+                        <TableCell className="border-1 border-gray-400" isHeader>QYK Shield-3Yrs</TableCell>
+                        <TableCell  className="border-1 border-gray-400" isHeader>QYK Max-1Yr</TableCell>
                       </>
                     )}
                     {/* <TableCell isHeader>Broker Details</TableCell>
@@ -88,15 +166,15 @@ export default function PolicyTableOne({ userRole }: PolicyTableOneProps) {
                 </TableHeader>
                 <TableBody>
                   {filtered.map((policy) => (
-                    <TableRow key={policy.id}>
-                      <TableCell>₹ {policy.minAmount} - ₹ {policy.maxAmount}</TableCell>
-                      <TableCell>{policy.adld ?policy.adld:'-' }
+                    <TableRow  key={policy.id}>
+                      <TableCell className="border-1 border-gray-400 text-center">₹ {policy.minAmount} - ₹ {policy.maxAmount}</TableCell>
+                      <TableCell className="border-1 border-gray-400 text-center">{policy.adld ?'₹'+policy.adld:'-' }
                       
                         </TableCell>
-                      <TableCell>{policy.ew1Year ? '₹'+ policy.ew1Year:'-' } </TableCell>
-                      <TableCell> {policy.ew2Year ? '₹'+ policy.ew2Year:'-' }</TableCell>
-                      <TableCell>{policy.ew3Year ? '₹'+ policy.ew3Year:'-' }</TableCell>
-                      <TableCell>{policy.combo1Year ? '₹'+ policy.combo1Year:'-' }</TableCell>
+                        <TableCell className="border-1 border-gray-400 text-center"> {policy.ew1Year ? '₹'+ policy.ew1Year:'-' }</TableCell>
+                      <TableCell className="border-1 border-gray-400 text-center"> {policy.ew2Year ? '₹'+ policy.ew2Year:'-' }</TableCell>
+                      <TableCell className="border-1 border-gray-400 text-center">{policy.ew3Year ? '₹'+ policy.ew3Year:'-' }</TableCell>
+                      <TableCell className="border-1 border-gray-400 text-center">{policy.combo1Year ? '₹'+ policy.combo1Year:'-' }</TableCell>
                       {/* <TableCell>{policy.brokerDetials}</TableCell>
                       <TableCell>
                         <button
@@ -120,7 +198,7 @@ export default function PolicyTableOne({ userRole }: PolicyTableOneProps) {
   return (
     <div>
       {/* Tabs */}
-      <div className="flex space-x-4 border-b pb-2">
+      <div className=" space-x-4 border-b pb-2">
         {categories.map((category) => (
           <button
             key={category}

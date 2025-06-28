@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 export default function CustomerForm() {
         const router = useRouter();
-  
+  const [cities, setCities] = useState<string[]>([]);
   const [form, setForm] = useState({
     title: "",
     customerName: "",
@@ -48,14 +48,14 @@ const handleChange = async (
       });
 
       const data = await res.json();
-
-      if (res.ok) {
-        setForm((prev) => ({
-          ...prev,
-          city: data.city,
-          state: data.state,
-        }));
-      }
+ if (res.ok && Array.isArray(data.cities)) {
+      setCities(data.cities);
+      setForm((prev) => ({
+        ...prev,
+        city: data.cities[0] || "",
+        state: data.state,
+      }));
+    }
     } catch (error:unknown) {
       console.error('Failed to lookup pincode', error);
     }
@@ -134,16 +134,23 @@ onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChange(e)}
             />
           </div>
         ))}
-        <label className="block font-medium">City</label>
-<input
-  type="text"
-  name="city"
-  value={form.city}
-  onChange={handleChange}
-  required
-  readOnly
-  className="w-full p-2 border rounded bg-gray-100"
-/>
+<div>
+  <label className="block font-medium">City</label>
+  <select
+    name="city"
+    value={form.city}
+    onChange={handleChange}
+    required
+    className="w-full p-2 border rounded"
+  >
+    <option value="">-- Select City --</option>
+    {cities.map((city) => (
+      <option key={city} value={city}>
+        {city}
+      </option>
+    ))}
+  </select>
+</div>
 <label className="block font-medium">State</label>
 
 <input

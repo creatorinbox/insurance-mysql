@@ -107,7 +107,11 @@ console.log('data',user)
     {
       name: "Customer",
       icon: <UserIcon />,
-      subItems: [{ name: " customer creation", path: "/create-customer", pro: false },
+      subItems: [
+         ...(user?.role === "DEALER"
+          ? [ { name: " customer creation", path: "/create-customer", pro: false }]
+          : []),
+       
         { name: " customer Listing", path: "/customer-tables", pro: false }
       ],
      
@@ -461,8 +465,7 @@ console.log('data',user)
     if (user?.role === "SUPERADMIN") {
       if (
         item.name === "Dealer" ||
-        item.name === "Insurance" ||
-        item.name === "Customer" 
+        item.name === "Insurance" 
  
       ) {
         return false;

@@ -205,7 +205,7 @@ import { DropdownItem } from "../ui/dropdown/DropdownItem";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; email: string; role: string; profileImage:string; } | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -216,6 +216,16 @@ export default function UserDropdown() {
         setUser(data);
       }
     };
+      
+    const fetchImage = async () => {
+      const res = await fetch("/api/profile/profile-image");
+      const data = await res.json();
+      if (res.ok && data.profileImage) {
+        setUser((prev) => prev ? { ...prev, profileImage: data.profileImage } : prev);
+      }
+    };
+    fetchImage();
+  
     fetchUser();
   }, []);
 
@@ -239,8 +249,13 @@ export default function UserDropdown() {
     <div className="relative">
       <button onClick={toggleDropdown} className="flex items-center text-gray-700 dark:text-gray-400">
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <Image width={44} height={44} src="/images/user/owner.jpg" alt="User" />
-        </span>
+<Image
+  width={44}
+  height={44}
+  src={user.profileImage || "/images/profile.png"}
+  alt={user.name || "User"}
+  className="rounded-full object-cover"
+/>     </span>
         <span className="block mr-1 font-medium text-theme-sm capitalize">{user.name}</span>
         <svg className={`stroke-gray-500 transition-transform ${isOpen ? "rotate-180" : ""}`} width="18" height="20">
           <path d="M4.3125 8.65625L9 13.3437L13.6875 8.65625" stroke="currentColor" strokeWidth="1.5" />
