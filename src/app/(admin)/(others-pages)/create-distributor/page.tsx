@@ -187,7 +187,7 @@ const data = await res.json();
       <h1 className="text-2xl font-semibold mb-4">Create Distributor</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
  {Object.entries(formData)
-  .filter(([key]) => key !== "planId")
+.filter(([key]) => key !== "planId" && key !== "role" && key !== "state")
   .map(([key, val]) => (
     <div key={key}>
       <label className="block mb-1 capitalize">

@@ -20,7 +20,7 @@ export default function PaymentHistoryPage() {
       .then((data) => setHistory(data))
       .finally(() => setLoading(false));
   }, []);
-
+console.log('historydata',history);
   if (loading) return <div className="p-8">Loading...</div>;
 
   return (

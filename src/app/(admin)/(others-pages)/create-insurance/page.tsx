@@ -487,7 +487,7 @@ console.log('catval',policies);
             <Input
   name="invoiceDate"
   type="date"
-  value={invoiceDate}
+  defaultValue={invoiceDate}
   onChange={(e) => setInvoiceDate(e.target.value)}
 />
             </div>

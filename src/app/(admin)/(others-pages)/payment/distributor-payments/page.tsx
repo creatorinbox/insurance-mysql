@@ -12,6 +12,7 @@ interface DistributorPayment {
   salesAmount: number;
   dueAmount: number;
   businessPartnerName: string;
+  city:string;
   dealerLocation: string;
   status: "ACTIVE" | "BLOCKED" | "TERMINATED" | "pending";
   effectiveDeduction: number;
@@ -225,7 +226,7 @@ const handleAction = async (id: number, action: "block" | "terminate"| "active")
               </td>
 
               <td className="p-2">{dealer.dealerName}</td>
-              <td className="p-2">{dealer.dealerLocation}</td>
+              <td className="p-2">{dealer.city}</td>
               <td className="p-2">{dealer.salesAmount ? `₹ ${dealer.salesAmount}` : ""}</td>
               <td className="p-2">{dealer.dueAmount ? `₹ ${dealer.dueAmount}` : ""}</td>
 

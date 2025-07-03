@@ -200,9 +200,9 @@ console.log('data',user)
     },
     {
       icon: <GridIcon />,
-      name: "Sub User",
+      name: "Manager",
       path: "/dealer/user",
-     subItems: [{ name: "userlist", path: "/dealer/user/list", pro: false }],
+     subItems: [{ name: "manager creation", path: "/dealer/user", pro: false },{ name: "userlist", path: "/dealer/user/list", pro: false }],
     },
     // {
     //   name: "Pages",
@@ -449,8 +449,7 @@ console.log('data',user)
        item.name === "Sales" ||
              item.name === "Endorsement" ||
              item.name === "Warranty  Plan Code" ||
-     (isSubUser && item.name === "Dashboard")
-
+ (isSubUser && (item.name === "Dashboard" || item.name === "Manager"))
       ) {
         return false;
       }
@@ -465,7 +464,7 @@ console.log('data',user)
         item.name === "Sales" ||
       item.name === "Endorsement" ||
          item.name === "Warranty  Plan Code" ||
-         item.name ==="Sub User"
+         item.name ==="Manager"
       ) {
         return false;
       }
@@ -474,7 +473,7 @@ console.log('data',user)
       if (
         item.name === "Dealer" ||
         item.name === "Insurance"  ||
-        item.name==="Sub User"
+        item.name==="Manager"
       ) {
         return false;
       }

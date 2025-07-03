@@ -291,7 +291,7 @@ export async function GET(req: Request) {
 
     const dealers = await prisma.dealer.findMany({
       where: { userId: parseInt(user.id,10) },
-      select: { id: true, dealerName: true, status: true,plan: true, dealerLocation:true,businessPartnerName:true},
+      select: { id: true, dealerName: true, status: true,plan: true, dealerLocation:true,businessPartnerName:true,city:true},
     });
 
     const dealerIds = dealers.map((d) => d.id);
@@ -466,6 +466,7 @@ let sgst=0;
       dealerName: dealer?.dealerName,
       status: dealer?.status,
       dealerLocation:dealer?.dealerLocation,
+      city:dealer?.city,
     businessPartnerName:dealer?.businessPartnerName,
       salesAmount,
       paidAmount,

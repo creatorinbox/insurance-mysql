@@ -122,7 +122,7 @@ const dealer = await prisma.dealer.findUnique({
   invoice={{
     dealerName: dealer?.dealerName || '',
     email: decoded.email,
-    location: dealer?.dealerLocation || '',
+    location: dealer?.city || '',
     invoiceNumber: payment.invoiceNumber,
     date: new Date(payment.createdAt).toLocaleDateString(),
     time: new Date(payment.createdAt).toLocaleTimeString(),

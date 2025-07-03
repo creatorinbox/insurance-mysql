@@ -205,7 +205,7 @@ import { DropdownItem } from "../ui/dropdown/DropdownItem";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<{ name: string; email: string; role: string; profileImage:string; } | null>(null);
+  const [user, setUser] = useState<{ name: string; email: string; role: string; profileImage:string; subuser:string; } | null>(null);
   const router = useRouter();
 
  useEffect(() => {
@@ -228,6 +228,7 @@ export default function UserDropdown() {
         email: userData.email,
         role: userData.role,
         profileImage,
+        subuser:userData.subuser,
       });
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -273,7 +274,7 @@ console.log('userdata',user);
         <div className="px-3 pb-3 border-b">
           <span className="block font-medium text-gray-700">{user.name}</span>
           <span className="text-sm text-gray-500">{user.email}</span>
-          <span className="block mt-1 text-xs text-gray-400 uppercase">{user.role}</span>
+          <span className="block mt-1 text-xs text-gray-400 uppercase">{user.subuser}</span>
         </div>
 <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200">
   <li>
