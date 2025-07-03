@@ -8,7 +8,7 @@ export default async function DashboardPage() {
   if (!user) redirect("/signin");
   if (user.expired) redirect("/reset-password");
 
-  const { id: userId, role } = user;
+  const { id: userId, role, subuser } = user;
   const today = new Date();
   const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
   const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -216,7 +216,7 @@ paidAmount=paidAmount;
 }
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6 capitalize">{role} Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-6 capitalize">{subuser} Dashboard</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white shadow rounded-lg p-6">

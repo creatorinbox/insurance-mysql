@@ -29,10 +29,10 @@ export async function updatePolicyPricing(id: string, data: PolicyPricingInput) 
     category,
     minAmount,
     maxAmount,
+    adld,
     ew1Year,
     ew2Year,
     ew3Year,
-    adld,
     combo1Year
   } = data;
 
@@ -42,10 +42,10 @@ export async function updatePolicyPricing(id: string, data: PolicyPricingInput) 
       category,
       minAmount,
       maxAmount,
+      adld,
       ew1Year,
       ew2Year,
       ew3Year,
-      adld,
       combo1Year,
     },
   });

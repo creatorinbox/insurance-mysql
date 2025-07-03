@@ -7,6 +7,7 @@ export async function getExtendedUserFromToken(): Promise<{
   role: "SUPERADMIN" | "DISTRIBUTOR" | "DEALER";
   passwordUpdatedAt: Date | null;
   expired: boolean;
+  subuser:string;
 } | null> {
   const user = await getUserFromToken();
   if (!user) return null;
@@ -38,5 +39,6 @@ export async function getExtendedUserFromToken(): Promise<{
     role: user.role,
     passwordUpdatedAt: result?.passwordUpdatedAt ?? null,
     expired,
+    subuser:user.subuser,
   };
 }

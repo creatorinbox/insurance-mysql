@@ -32,7 +32,26 @@ export default function CustomerForm() {
 // ) => {
 //   setForm({ ...form, [e.target.name]: e.target.value });
 // };
+const validateForm = () => {
+  const errors: string[] = [];
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const mobileRegex = /^\d{10}$/;
+  const kycNumberRegex = /^[A-Z0-9]{6,}$/; // Adjust as per KYC rules
+const nameRegex = /^[A-Za-z\s]+$/;
+
+if (!nameRegex.test(form.customerName)) {
+  errors.push("Customer name must contain only letters and spaces");
+}
+  if (!form.customerName.trim()) errors.push("Customer name is required");
+  if (!mobileRegex.test(form.mobile)) errors.push("Mobile must be 10 digits");
+  if (!emailRegex.test(form.email)) errors.push("Invalid email format");
+  if (!form.kyc) errors.push("KYC type is required");
+  if (form.kyc && !kycNumberRegex.test(form.kycNumber)) errors.push("Invalid KYC number");
+  if (!form.dateOfBirth) errors.push("Date of birth is required");
+
+  return errors;
+};
 const handleChange = async (
   e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
 ) => {
@@ -67,6 +86,11 @@ const handleChange = async (
     setError("");
     setSuccess("");
 
+  const validationErrors = validateForm();
+  if (validationErrors.length > 0) {
+    setError(validationErrors.join(", "));
+    return;
+  }
     const res = await fetch("/api/customer/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

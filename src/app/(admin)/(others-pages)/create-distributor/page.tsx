@@ -17,9 +17,12 @@ type Plan = {
 };
 
 export default function CreateDistributorPage() {
+  const [showPassword, setShowPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 //const [location, setLocation] = useState({ city: "", state: "" });
+const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [formData, setFormData] = useState({
     name: "",
@@ -33,9 +36,10 @@ export default function CreateDistributorPage() {
     gstNumber: "",
     contactPerson: "",
     contactMobile: "",
-    region: "",
+    //region: "",
     planId: "",
         pinCode: "",
+        role:"",
 
   });
 const [location, setLocation] = useState({
@@ -52,6 +56,33 @@ const [selectedCity, setSelectedCity] = useState("");
     fetchPlans();
   console.log("📍 State:", location.state);
   }, [location]);
+const validateForm = () => {
+  const newErrors: { [key: string]: string } = {};
+  const nameRegex = /^[A-Za-z\s]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const mobileRegex = /^\d{10}$/;
+
+  if (!nameRegex.test(formData.name)) {
+    newErrors.name = "Name should contain only letters";
+  }
+
+  
+
+  if (!emailRegex.test(formData.email)) {
+    newErrors.email = "Invalid email format";
+  }
+
+  if (!mobileRegex.test(formData.mobile)) {
+    newErrors.mobile = "Mobile must be exactly 10 digits";
+  }
+
+  if (!mobileRegex.test(formData.contactMobile)) {
+    newErrors.contactMobile = "Contact Mobile must be exactly 10 digits";
+  }
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
   const handleChange = async (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -93,7 +124,8 @@ const [selectedCity, setSelectedCity] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+const isValid = validateForm();
+  if (!isValid) return;
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).{8,}$/;
 
@@ -104,11 +136,16 @@ const [selectedCity, setSelectedCity] = useState("");
       return;
     }
 
+if (formData.password !== formData.confirmPassword) {
+  alert("Passwords do not match.");
+  return;
+}
   const payload = {
     ...formData,
     planId: parseInt(formData.planId, 10), // ✅ force planId to integer
     city:selectedCity,
   state: location.state,
+  role:formData.role,
   };
     const res = await fetch("/api/distributor", {
       method: "POST",
@@ -117,7 +154,7 @@ const [selectedCity, setSelectedCity] = useState("");
         "Content-Type": "application/json",
       },
     });
-
+const data = await res.json();
     if (res.ok) {
       alert("Distributor created!");
       setFormData({
@@ -132,14 +169,16 @@ const [selectedCity, setSelectedCity] = useState("");
         gstNumber: "",
         contactPerson: "",
         contactMobile: "",
-        region: "",
+        //region: "",
         planId: "",
         pinCode: "",
+        role:"",
 
       });
       setSelectedPlan(null);
     } else {
-      alert("Failed to create distributor.");
+      alert(data.error || "Failed to create distributor.");
+     // alert("Failed to create distributor.");
     }
   };
 
@@ -147,24 +186,75 @@ const [selectedCity, setSelectedCity] = useState("");
     <div className="max-w-xl mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4">Create Distributor</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {Object.entries(formData)
-          .filter(([key]) => key !== "planId")
-          .map(([key, val]) => (
-            <div key={key}>
-              <label className="block mb-1 capitalize">
-                {key.replace(/([A-Z])/g, " $1")}
-              </label>
-              <input
-                type="text"
-                name={key}
-                value={val}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-        ))}
+ {Object.entries(formData)
+  .filter(([key]) => key !== "planId")
+  .map(([key, val]) => (
+    <div key={key}>
+      <label className="block mb-1 capitalize">
+        {key.replace(/([A-Z])/g, " $1")}
+      </label>
+     {key.includes("password") ? (
+  <div className="relative">
+    <input
+      type={
+        key === "password"
+          ? showPassword
+            ? "text"
+            : "password"
+          : showConfirmPassword
+          ? "text"
+          : "password"
+      }
+      name={key}
+      value={val}
+      onChange={handleChange}
+      className="w-full p-2 border rounded pr-10"
+      required
+    />
+    <button
+      type="button"
+      onClick={() =>
+        key === "password"
+          ? setShowPassword((prev) => !prev)
+          : setShowConfirmPassword((prev) => !prev)
+      }
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"
+    >
+      {((key === "password" && showPassword) ||
+        (key === "confirmPassword" && showConfirmPassword))
+        ? "🙈"
+        : "👁️"}
+    </button>
+  </div>
+) : (
+  <input
+    type="text"
+    name={key}
+    value={val}
+    onChange={handleChange}
+    className="w-full p-2 border rounded"
+    required
+  />
+)}
 
+      {errors[key] && (
+        <p className="text-sm text-red-600 mt-1">{errors[key]}</p>
+      )}
+    </div>
+))}
+<div>
+  <Label>Select Role</Label>
+  <select
+    name="role"
+    required
+    className="w-full border px-3 py-2 rounded"
+  >
+    <option value="DISTRIBUTOR">DISTRIBUTOR</option>
+    <option value="LFR">LFR</option>
+    <option value="NBFC">NBFC</option>
+    <option value="Bank">Bank</option>
+  </select>
+</div>
 <div>
   <Label>Select City</Label>
   <select

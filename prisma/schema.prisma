@@ -271,6 +271,8 @@ enum user_role {
   BANK
   SUPERADMIN
   CUSTOMER
+  LFR
+STORE
 }
 model IndiaLocation {
   id       Int    @id @default(autoincrement())
@@ -294,11 +296,13 @@ model UserMeta {
   role       user_role // Enum: SUPERADMIN, DEALER, DISTRIBUTOR
   roleId     Int       // Foreign key to the respective table
   name        String
-  email      String
+  email      String  @unique
+  mobile     String @unique
   password   String
   city       String?
   state      String?
   pincode    String?
+  subuser    String?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 }

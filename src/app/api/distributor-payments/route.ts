@@ -299,7 +299,7 @@ export async function GET(req: Request) {
 
     //const today = new Date("2025-05-31");
     const today = new Date();
-    const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  //  const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
     const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
     const isMonthEnd = (endDate.getDate() - today.getDate()) <= 6;
 console.log('monthend',isMonthEnd);
@@ -307,7 +307,7 @@ console.log('monthend',isMonthEnd);
     const insurances = await prisma.insurance.findMany({
       where: {
         userId: { in: dealerIds },
-        policyBookingDate: { gte: startDate, lte: endDate },
+       // policyBookingDate: { gte: startDate, lte: endDate },
       },
       select: { userId: true, invoiceAmount: true , dueamount:true,SalesAmount:true},
     });
@@ -334,7 +334,7 @@ console.log('monthend',isMonthEnd);
     const payments = await prisma.payment.findMany({
       where: {
         dealerId: { in: dealerIds },
-        createdAt: { gte: startDate, lte: endDate },
+        //createdAt: { gte: startDate, lte: endDate },
       },
       select: { dealerId: true, baseAmount: true },
     });

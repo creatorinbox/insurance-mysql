@@ -208,27 +208,34 @@ export default function UserDropdown() {
   const [user, setUser] = useState<{ name: string; email: string; role: string; profileImage:string; } | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const res = await fetch("/api/auth/me");
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data);
-      }
-    };
-      
-    const fetchImage = async () => {
-      const res = await fetch("/api/profile/profile-image");
-      const data = await res.json();
-      if (res.ok && data.profileImage) {
-        setUser((prev) => prev ? { ...prev, profileImage: data.profileImage } : prev);
-      }
-    };
-    fetchImage();
-  
-    fetchUser();
-  }, []);
+ useEffect(() => {
+  const fetchUserData = async () => {
+    try {
+      const [userRes, imageRes] = await Promise.all([
+        fetch("/api/auth/me"),
+        fetch("/api/profile/profile-image"),
+      ]);
 
+      if (!userRes.ok) return;
+
+      const userData = await userRes.json();
+      const imageData = await imageRes.json();
+
+      const profileImage = imageData?.profileImage || "";
+
+      setUser({
+        name: userData.name,
+        email: userData.email,
+        role: userData.role,
+        profileImage,
+      });
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  fetchUserData();
+}, []);
   const handleLogout = async () => {
     await fetch("/api/logout", { method: "POST" });
     router.push("/login");
@@ -242,7 +249,7 @@ export default function UserDropdown() {
   function closeDropdown() {
     setIsOpen(false);
   }
-
+console.log('userdata',user);
   if (!user) return null;
 
   return (

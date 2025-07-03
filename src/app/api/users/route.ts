@@ -57,6 +57,8 @@ await prisma.userMeta.create({
       state:superadmin.state,
       pincode:superadmin.pinCode,
 password:superadmin.password,
+mobile:superadmin.mobile,
+subuser:"SUPERADMIN",
 updatedAt:new Date(),
 
           },

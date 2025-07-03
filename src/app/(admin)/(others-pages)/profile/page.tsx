@@ -19,10 +19,11 @@ interface UserProfile {
   status?: string;
   region?: string;
   profileImage?: string; // ✅ optional
+  brokerDetails?:string;
 }
 
 const editableFields: Record<UserRole, string[]> = {
-  SUPERADMIN: ["name", "email", "mobile", "address", "city", "state", "gstNumber", "contactPerson"],
+  SUPERADMIN: ["name", "email", "mobile", "address", "city", "state", "gstNumber", "contactPerson","brokerDetails"],
   DEALER: ["dealerName", "email", "mobile", "dealerLocation", "businessPartnerName", "status"],
   DISTRIBUTOR: ["name", "email", "mobile", "city", "state", "region", "contactPerson"],
 };

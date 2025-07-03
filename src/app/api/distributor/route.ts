@@ -23,7 +23,22 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ message: "Invalid token" }, { status: 403 });
         }
     const body = await req.json();
-
+// // Validate unique mobile
+        const existing = await prisma.userMeta.findUnique({
+          where: { mobile:body.mobile, },
+        });
+    
+        if (existing) {
+          return NextResponse.json({ error: "Mobile number already exists" }, { status: 409 });
+        }
+        // Validate unique mobile
+        const existingemail = await prisma.userMeta.findUnique({
+          where: { email:body.email },
+        });
+    
+        if (existingemail) {
+          return NextResponse.json({ error: "Email already exists" }, { status: 409 });
+        }
     const distributor = await prisma.distributor.create({
       data: {
         name: body.name,
@@ -36,7 +51,7 @@ export async function POST(req: NextRequest) {
         gstNumber: body.gstNumber,
         contactPerson: body.contactPerson,
         contactMobile: body.contactMobile,
-        region: body.region,
+        region: body.city,
         active: true,
         password:body.password,
         status:"ACTIVE",
@@ -46,16 +61,19 @@ export async function POST(req: NextRequest) {
         note:"",
       },
     });
+
 await prisma.userMeta.create({
       data: {
          role: 'DISTRIBUTOR',
       roleId: distributor.id,
       name: distributor.name,
       email: distributor.email,
+      mobile:distributor.mobile,
       password:distributor.password,
       city:distributor.city,
       state:distributor.state,
       pincode:distributor.pinCode,
+      subuser:body.role,
 updatedAt:new Date(),
 
           },

@@ -48,6 +48,7 @@ export default function CustomerClient() {
   }, [mobile]);
 
 //   const handlePDFDownload = (policy: Insurance) => {
+//      try {
 //     const doc = new jsPDF();
 
 //     // ✅ Header Section
@@ -105,7 +106,7 @@ export default function CustomerClient() {
 
 //      nextYPosition = doc.lastAutoTable.finalY + 15;
 
-//     doc.text("📦 Asset Details:", 20, nextYPosition);
+//     doc.text("Asset Details:", 20, nextYPosition);
 
 //     // ✅ Asset Details Table
 //     autoTable(doc, {
@@ -165,8 +166,28 @@ export default function CustomerClient() {
 //     doc.text("For support, contact support@qykcare.com", 20, doc.lastAutoTable.finalY + 30);
 
 //     doc.save(`${policy.policyNumber}-Membership-Details.pdf`);
+//   } catch (err) {
+//     console.error("PDF generation failed:", err);
+//     alert("PDF download failed — see console for details");
+//   }
 //   };
+const handlePDFDownload = async (policy: Insurance) => {
+  const res = await fetch("/api/generate-word", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(policy),
+  });
 
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${policy.policyNumber}-Membership.docx`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
   return (
     <div className="p-10 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold mb-5">
@@ -207,10 +228,11 @@ export default function CustomerClient() {
                   <td className="p-2 border">
                     <button
                       className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                       onClick={() => handlePDFDownload(policy)}
                     >
                       Download PDF
                     </button>
-                     {/* onClick={() => handlePDFDownload(policy)} */}
+                    
 
                   </td>
                 </tr>

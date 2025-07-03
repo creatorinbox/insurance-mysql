@@ -29,6 +29,49 @@ interface Customer {
   kycNumber:string;
   dateOfBirth: string;
 }
+type EwYearOption = {
+  value: string;
+  label: string;
+};
+interface Insurance {
+  id:number;
+  mobile: string;
+        kitNumber: string;
+        policyType: string;
+        policyHolder: string;
+        productName:string;
+        productId: string;
+        tier: string;
+        certificateNo: string;
+        policyNumber: string;
+        policyStartDate: string;
+        expiryDate: string;
+        policyStatus: string;
+        make: string;
+        modelNo: string;
+        invoiceDate:string;
+        invoiceAmount: string;
+        invoiceNo:string;
+        imeiNumber: string;
+        salesChannel: string;
+        dealerName: string;
+        dealerLocation: string;
+        dealerCode: string;
+        vas: string;
+        businessPartnerName: string;
+        businessPartnerCategory: string;
+        lanNumber: string;
+        policyBookingDate: string;
+        membershipFees: string;
+        SalesAmount: string;
+        brokerDetails: string;
+        locationCode: string;
+        loanApiIntegration: string;
+        userId: string;
+        dueamount:string;
+        warrenty:string;
+        updatedAt:string;
+}
 export default function FormElements() {
     const [showThankYouModal, setShowThankYouModal] = useState(false);
   //const { userId } = useParams<{ userId: string }>();
@@ -39,7 +82,11 @@ export default function FormElements() {
 const [formDataToSubmit, setFormDataToSubmit] = useState<FormData | null>(null);
 const [planDetails, setPlanDetails] = useState<PlanDetails | null>(null); // to show in modal
       const router = useRouter();
-
+const [createdInsurance, setCreatedInsurance] =  useState<Insurance | null>(null);
+const [invoiceDate, setInvoiceDate] = useState(() => {
+  const today = new Date();
+  return today.toISOString().split("T")[0]; // returns YYYY-MM-DD
+});
   const [mobileInput, setMobileInput] = useState("");
   const [customerData, setCustomer] = useState<Customer | null>(null);
 const [notFound, setNotFound] = useState(false);
@@ -52,43 +99,7 @@ const makeOptions = [
   { value: "LG", label: "LG" },
   { value: "Others", label: "Others" },
 ];
-// const states = [
-//   { value: "01", label: "Andhra Pradesh" },
-//   { value: "02", label: "Arunachal Pradesh" },
-//   { value: "03", label: "Assam" },
-//   { value: "04", label: "Bihar" },
-//   { value: "05", label: "Chhattisgarh" },
-//   { value: "06", label: "Goa" },
-//   { value: "07", label: "Gujarat" },
-//   { value: "08", label: "Haryana" },
-//   { value: "09", label: "Himachal Pradesh" },
-//   { value: "10", label: "Jharkhand" },
-//   { value: "11", label: "Karnataka" },
-//   { value: "12", label: "Kerala" },
-//   { value: "13", label: "Madhya Pradesh" },
-//   { value: "14", label: "Maharashtra" },
-//   { value: "15", label: "Manipur" },
-//   { value: "16", label: "Meghalaya" },
-//   { value: "17", label: "Mizoram" },
-//   { value: "18", label: "Nagaland" },
-//   { value: "19", label: "Odisha" },
-//   { value: "20", label: "Punjab" },
-//   { value: "21", label: "Rajasthan" },
-//   { value: "22", label: "Sikkim" },
-//   { value: "23", label: "Tamil Nadu" },
-//   { value: "24", label: "Telangana" },
-//   { value: "25", label: "Tripura" },
-//   { value: "26", label: "Uttar Pradesh" },
-//   { value: "27", label: "Uttarakhand" },
-//   { value: "28", label: "West Bengal" },
-//   { value: "29", label: "Andaman and Nicobar Islands" },
-//   { value: "30", label: "Chandigarh" },
-//   { value: "31", label: "Dadra and Nagar Haveli" },
-//   { value: "32", label: "Daman and Diu" },
-//   { value: "33", label: "Delhi" },
-//   { value: "34", label: "Lakshadweep" },
-//   { value: "35", label: "Puducherry" },
-// ];
+const [availableEwYears, setAvailableEwYears] = useState<{ value: string; label: string }[]>([]);
   // Fetch policies and dealers
   useEffect(() => {
     async function fetchOptions() {
@@ -118,6 +129,42 @@ const makeOptions = [
     fetchOptions();
   }, []);
 
+const handleProductChange = async (selectedProduct: string) => {
+  const selectedPolicy = policies.find((p) => p.category === selectedProduct);
+
+  if (!selectedPolicy) return;
+
+  // Check non-empty fields manually or fetch pricing data
+  // If you already have pricing structure per product, use that
+  const res = await fetch(`/api/plan-pricing-check/${selectedProduct}`);
+  //const pricing = await res.json();
+
+  // const mapped = [];
+
+  // if (pricing.adld) mapped.push({ value: "adld", label: "QYK Protect" });
+  // if (pricing.combo1Year) mapped.push({ value: "combo1Year", label: "QYK Max" });
+  // if (pricing.ew1Year) mapped.push({ value: "ew1Year", label: "QYK Shield 1 Year" });
+  // if (pricing.ew2Year) mapped.push({ value: "ew2Year", label: "QYK Shield 2 Year" });
+  // if (pricing.ew3Year) mapped.push({ value: "ew3Year", label: "QYK Shield 3 Year" });
+
+  // setAvailableEwYears(mapped);
+  // console.log("✅ Available EW Years:", mapped);
+  const { availablePlans } = await res.json();
+
+if (!availablePlans || availablePlans.length === 0) {
+  console.warn("No available plans found.");
+  return;
+}
+
+setAvailableEwYears(
+  availablePlans.map((plan: EwYearOption) => ({
+    value: plan.value,
+    label: plan.label,
+  }))
+);
+
+};
+
   // Search Customer
   const handleSearch = async () => {
     const res = await fetch("/api/customer/search", {
@@ -137,26 +184,7 @@ const makeOptions = [
     }
   };
 
-  // Form Submit
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   const form = new FormData(e.currentTarget as HTMLFormElement);
-  //   form.append("userId", userId);
 
-  //   const res = await fetch("/api/insurance", {
-  //     method: "POST",
-  //     body: form,
-  //   });
-
-  //   if (!res.ok) {
-  //     alert("Failed to create insurance");
-  //           router.push("/insurance-tables");
-
-
-  //   } else {
-  //     alert("Insurance created successfully");
-  //   }
-  // };
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   const form = new FormData(e.currentTarget as HTMLFormElement);
@@ -205,9 +233,41 @@ const handleFinalSubmit = async () => {
     alert("Failed to create insurance");
   //  router.push("/insurance-tables");
   } else {
-    alert("Insurance created successfully");
+      const data = await res.json();
+  alert("Insurance created successfully");
+
+  setCreatedInsurance(data); // 👈 store inserted insurance
+  console.log('insurancedata',data);
           setShowThankYouModal(true); // Show the "Thank You" popup
-    router.push("/insurance-tables");
+    //router.push("/insurance-tables");
+  }
+};
+
+const handleDownloadPDF = async () => {
+   if (!createdInsurance || !createdInsurance.id) {
+    alert("No insurance ID found");
+    return;
+  }
+  try {
+    const response = await fetch(`/api/download-policy/${createdInsurance.id}`);
+
+    if (!response.ok) {
+      throw new Error('Failed to generate PDF');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'policy-acknowledgment.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error(error);
+    alert('Error downloading PDF');
   }
 };
 
@@ -311,7 +371,7 @@ console.log('catval',policies);
 </div> */}
             <div>
               <Label>Product Name</Label>
-              <div className="relative">
+              {/* <div className="relative">
                 <Select
                   name="productName"
                   options={policies.map((p) => ({
@@ -325,13 +385,22 @@ console.log('catval',policies);
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                   <ChevronDownIcon />
                 </span>
-              </div>
-
+              </div> */}
+<Select
+  name="productName"
+  options={policies.map((p) => ({
+    value: p.category,
+    label: p.category,
+  }))}
+  placeholder="Select Product Name"
+  onChange={(val) => handleProductChange(val)}
+  className="dark:bg-dark-900"
+/>
             </div>
                <div>
               <Label>Extended Warranty Period</Label>
               <div className="relative">
-                <Select
+                {/* <Select
                   name="ewYear"
                  options={[
                           { value: "adld", label: "QYK Protect" },
@@ -344,31 +413,20 @@ console.log('catval',policies);
                   placeholder="Select Extended Warranty Period"
                   onChange={() => {}}
                   className="dark:bg-dark-900"
-                />
+                /> */}
+                <Select
+  name="ewYear"
+  options={availableEwYears}
+  placeholder="Select Extended Warranty"
+  onChange={() => {}}
+  className="dark:bg-dark-900"
+/>
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                   <ChevronDownIcon />
                 </span>
               </div>
             </div>
-{/* 
-            <div>
-              <Label>Dealer</Label>
-              <div className="relative">
-                <Select
-                  name="dealerId"
-                  options={dealers.map((d) => ({
-                    value: d.id,
-                    label: d.dealerName,
-                  }))}
-                  placeholder="Select dealer"
-                  onChange={() => {}}
-                  className="dark:bg-dark-900"
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <ChevronDownIcon />
-                </span>
-              </div>
-            </div> */}
+
           </div>
         </ComponentCard>
 
@@ -426,7 +484,12 @@ console.log('catval',policies);
             </div>
             <div>
               <Label>Invoice Date</Label>
-              <Input name="invoiceDate" type="date" />
+            <Input
+  name="invoiceDate"
+  type="date"
+  value={invoiceDate}
+  onChange={(e) => setInvoiceDate(e.target.value)}
+/>
             </div>
 
             <div>
@@ -509,6 +572,13 @@ console.log('catval',policies);
           <div className="bg-white p-6 rounded-lg shadow-lg text-center">
             <h2 className="text-xl font-bold">🎉 Thank You!</h2>
             <p className="text-gray-600">Your insurance has been created successfully.</p>
+            {/* Download PDF Button */}
+      <button
+        onClick={handleDownloadPDF}
+        className="mt-4 px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700"
+      >
+        Download Policy PDF
+      </button>
             <button
               onClick={() => {
                 setShowThankYouModal(false);

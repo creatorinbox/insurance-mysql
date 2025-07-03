@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
     const policyStartDate = new Date(); // current date
 const expiryDate = new Date();
 expiryDate.setFullYear(policyStartDate.getFullYear() + 1); // add 1 year
-
+expiryDate.setDate(expiryDate.getDate() - 1);
 // Helper: Generate 5-digit number
 const generateSerial = () => Math.floor(10000 + Math.random() * 90000).toString();
 

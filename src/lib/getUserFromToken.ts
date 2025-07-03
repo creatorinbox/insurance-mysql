@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 interface JwtPayload {
   id: string;
   role: "SUPERADMIN" | "DISTRIBUTOR" | "DEALER";
+  subuser:string;
 }
 
 export async function getUserFromToken(): Promise<JwtPayload | null> {

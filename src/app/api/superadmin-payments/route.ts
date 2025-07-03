@@ -216,9 +216,9 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
-    const today = new Date();
-    const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-    const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+   // const today = new Date();
+  //  const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+   // const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
     // 1. Get ALL Distributors under SUPERADMIN
     const distributors = await prisma.distributor.findMany({
@@ -247,7 +247,7 @@ export async function GET(req: Request) {
     const payments = await prisma.payment.findMany({
       where: {
         dealerId: { in: dealerIds },
-        createdAt: { gte: startDate, lte: endDate },
+        //createdAt: { gte: startDate, lte: endDate },
       },
     });
 
@@ -259,7 +259,7 @@ export async function GET(req: Request) {
     const insurances = await prisma.insurance.findMany({
       where: {
         userId: { in: dealerIds },
-        policyBookingDate: { gte: startDate, lte: endDate },
+       // policyBookingDate: { gte: startDate, lte: endDate },
       },
       select: {
         userId: true,

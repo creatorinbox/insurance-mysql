@@ -75,7 +75,7 @@ export async function POST(req: Request) {
 
   // Step 2: Sign JWT
   const token = jwt.sign(
-    { id: meta.roleId, email: meta.email, role: meta.role, name:meta.name },
+    { id: meta.roleId, email: meta.email, role: meta.role, name:meta.name,subuser:meta.subuser },
     process.env.JWT_SECRET!,
     { expiresIn: "2h" }
   );

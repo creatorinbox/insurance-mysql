@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromToken } from "@/lib/getUserFromToken";
 import crypto from "crypto";
-import { v4 as uuidv4 } from "uuid"; // Import UUID for uniqueness
+//import { v4 as uuidv4 } from "uuid"; // Import UUID for uniqueness
 import { redirect } from "next/navigation";
 
 export async function POST(req: NextRequest) {
@@ -26,7 +26,9 @@ export async function POST(req: NextRequest) {
     if (generatedSignature !== signature) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
-const invoiceNumber = `INV-${Date.now()}-${uuidv4().slice(0, 8)}`;
+    const timestampPart = Math.floor(Date.now() / 1000).toString().slice(-6); // last 6 digits of Unix timestamp
+const randomPart = Math.floor(1000 + Math.random() * 9000).toString(); // 4-digit random number
+const invoiceNumber = 'INV-' + timestampPart + randomPart;
     // ✅ Store Bulk Payment Records
     await prisma.payment.createMany({
       data: dealerIds.map((dealerId: number) => ({

@@ -145,7 +145,9 @@ function PlanRow({ plan }: { plan: Plan }) {
 
           {tiers.map((tier, index) => (
             <div key={index} className="flex gap-4 items-center">
+              <Label>insuranceCount</Label>
               <input type="number" value={tier.insuranceCount} onChange={(e) => handleTierChange(index, "insuranceCount", parseInt(e.target.value))} className="border px-3 py-2 rounded w-full" />
+             <Label>discount</Label>
               <input type="number" value={tier.discount} onChange={(e) => handleTierChange(index, "discount", parseFloat(e.target.value))} className="border px-3 py-2 rounded w-full" />
             </div>
           ))}

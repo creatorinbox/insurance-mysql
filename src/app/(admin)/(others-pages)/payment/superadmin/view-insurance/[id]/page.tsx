@@ -39,16 +39,24 @@ export default function DistributorInsuranceListPage() {
             <th className="p-2">Due Amount</th>
           </tr>
         </thead>
-        <tbody>
-          {insurances.map((ins) => (
-            <tr key={ins.id} className="border-b">
-              <td className="p-2">{ins.dealerId}</td>
-              <td className="p-2">{ins.dealerName}</td>
-              <td className="p-2">₹ {ins.invoiceAmount}</td>
-              <td className="p-2">₹ {ins.dueamount}</td>
-            </tr>
-          ))}
-        </tbody>
+      <tbody>
+  {insurances.length === 0 ? (
+    <tr>
+      <td colSpan={4} className="p-4 text-center text-gray-500">
+        No insurance found.
+      </td>
+    </tr>
+  ) : (
+    insurances.map((ins) => (
+      <tr key={ins.id} className="border-b">
+        <td className="p-2">{ins.dealerId}</td>
+        <td className="p-2">{ins.dealerName}</td>
+        <td className="p-2">₹ {ins.invoiceAmount}</td>
+        <td className="p-2">₹ {ins.dueamount}</td>
+      </tr>
+    ))
+  )}
+</tbody>
       </table>
     </div>
   );

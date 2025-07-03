@@ -5,6 +5,7 @@ type UserData = {
   id: string;
   email: string;
   role: string;
+  subuser:string;
 };
 
 export const useAuth = () => {

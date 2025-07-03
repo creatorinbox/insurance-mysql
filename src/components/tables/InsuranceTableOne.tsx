@@ -90,6 +90,12 @@ const handleUpdateStatus = async (policyId: string, newStatus: string) => {
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+      <button
+  onClick={() => window.open("/api/insurance/daily-report", "_blank")}
+  className="mb-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+>
+  Download Daily PDF
+</button>
       <div className="max-w-full overflow-x-auto">
         <div className="min-w-[1200px]">
           <Table>

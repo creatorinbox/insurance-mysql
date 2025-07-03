@@ -194,9 +194,15 @@ console.log('data',user)
     },
      {
       icon: <GridIcon />,
-      name: "Warrenty Plan Code",
+      name: "Warranty  Plan Code",
       path: "/plan-codes",
       //subItems: [{ name: "Ecommerce", path: "/dashboard", pro: false }],
+    },
+    {
+      icon: <GridIcon />,
+      name: "Sub User",
+      path: "/dealer/user",
+     subItems: [{ name: "userlist", path: "/dealer/user/list", pro: false }],
     },
     // {
     //   name: "Pages",
@@ -429,6 +435,7 @@ console.log('data',user)
   };
   const filteredNavItems = navItems.filter((item) => {
     if (user?.role === "DEALER") {
+        const isSubUser = user.subuser === "1"; // or use === 1 if it's a number
       if (
         item.name === "Policy" ||
         item.name === "Distributor" ||
@@ -441,8 +448,8 @@ console.log('data',user)
 
        item.name === "Sales" ||
              item.name === "Endorsement" ||
-             item.name === "Warrenty Plan Code"
-
+             item.name === "Warranty  Plan Code" ||
+     (isSubUser && item.name === "Dashboard")
 
       ) {
         return false;
@@ -457,7 +464,8 @@ console.log('data',user)
         item.name === "Allocate Policy" ||
         item.name === "Sales" ||
       item.name === "Endorsement" ||
-         item.name === "Warrenty Plan Code"
+         item.name === "Warranty  Plan Code" ||
+         item.name ==="Sub User"
       ) {
         return false;
       }
@@ -465,8 +473,8 @@ console.log('data',user)
     if (user?.role === "SUPERADMIN") {
       if (
         item.name === "Dealer" ||
-        item.name === "Insurance" 
- 
+        item.name === "Insurance"  ||
+        item.name==="Sub User"
       ) {
         return false;
       }

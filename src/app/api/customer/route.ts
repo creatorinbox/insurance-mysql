@@ -64,7 +64,10 @@ export async function GET(req: NextRequest) {
         userId:true,
   invoiceNo  :true,            
   imeiNumber :true,   
-  modelNo:true,        
+  modelNo:true,     
+  SalesAmount:true,
+  dueamount:true,   
+  make:true,
 
       },
     });
@@ -97,13 +100,15 @@ export async function GET(req: NextRequest) {
             }
           }
         }
+                  let dealermobile;
+
  // Fetch dealer name using userId
         if (i.userId) {
           const dealer = await prisma.dealer.findUnique({
             where: { id: i.userId },
-            select: { dealerName: true },
+           // select: { dealerName: true },
           });
-
+      dealermobile = dealer?.lanNumber || "Unknown Dealer";
           dealerName = dealer?.dealerName || "Unknown Dealer";
         }
         
@@ -111,6 +116,7 @@ export async function GET(req: NextRequest) {
           ...i,
           policyPrice,
           dealerName,
+         dealermobile,
           customer,
         };
       })

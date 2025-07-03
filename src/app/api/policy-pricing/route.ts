@@ -7,10 +7,10 @@ interface PolicyPricingRow {
   Category: string;
   MinAmount: number | string;
   MaxAmount: number | string;
+    ADLD?: number | string;
   EW1Year?: number | string;
   EW2Year?: number | string;
   EW3Year?: number | string;
-  ADLD?: number | string;
   Combo1Year?: number | string;
 }
 export async function POST(req: Request) {
@@ -44,10 +44,10 @@ export async function POST(req: Request) {
       category: row.Category,
       minAmount: Number(row.MinAmount),
       maxAmount: Number(row.MaxAmount),
+        adld: row.ADLD ? Number(row.ADLD) : undefined,
       ew1Year: row.EW1Year ? Number(row.EW1Year) : undefined,
       ew2Year: row.EW2Year ? Number(row.EW2Year) : undefined,
       ew3Year: row.EW3Year ? Number(row.EW3Year) : undefined,
-      adld: row.ADLD ? Number(row.ADLD) : undefined,
       combo1Year: row.Combo1Year ? Number(row.Combo1Year) : undefined,
       updatedAt:new Date(),
     }));

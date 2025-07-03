@@ -62,6 +62,41 @@ const [state, setStates] = useState<string[]>([]);
   // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   setFormData({ ...formData, [e.target.name]: e.target.value });
   // };
+  const validateForm = () => {
+  const nameRegex = /^[A-Za-z\s]+$/;
+  const mobileRegex = /^\d{10}$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const kycNumberRegex = /^[A-Z0-9]{6,20}$/; // generic KYC pattern — feel free to adjust
+
+  const errors: string[] = [];
+
+  if (!formData.customerName || !nameRegex.test(formData.customerName)) {
+    errors.push("Customer name should contain only letters and spaces");
+  }
+
+  if (!mobileRegex.test(formData.mobile)) {
+    errors.push("Mobile must be exactly 10 digits");
+  }
+
+  if (!emailRegex.test(formData.email)) {
+    errors.push("Invalid email format");
+  }
+
+  if (!formData.kyc) {
+    errors.push("KYC type is required");
+  }
+
+  if (formData.kyc && !kycNumberRegex.test(formData.kycNumber)) {
+    errors.push("Invalid KYC number");
+  }
+
+  if (!formData.dateOfBirth) {
+    errors.push("Date of Birth is required");
+  }
+
+  return errors;
+};
+
   const handleChange = async (
   e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
 ) => {
@@ -97,6 +132,11 @@ const [state, setStates] = useState<string[]>([]);
 };
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault(); // ✅ Prevents page reload
+  const errors = validateForm();
+if (errors.length > 0) {
+  alert(errors.join("\n"));
+  return;
+}
     const endpoint = isEdit ? "/api/customer/update" : "/api/customer/create";
   
     // Ensure original mobile number is passed for update
